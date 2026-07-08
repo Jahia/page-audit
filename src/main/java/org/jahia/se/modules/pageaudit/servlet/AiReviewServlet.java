@@ -84,7 +84,9 @@ public class AiReviewServlet extends HttpServlet {
             + "  ]\n"
             + "}\n"
             + "Maximum 15 recommendations, most important first. "
-            + "Write every user-facing string (summary, title, detail) in the language whose ISO code is given as PAGE LANGUAGE.";
+            + "You MUST write every user-facing string (summary, title, detail) in the REPORT LANGUAGE stated in the "
+            + "input - regardless of the language of the page text. Only the \"wording\" field keeps the page's own "
+            + "language, since it quotes the page verbatim.";
 
     @Reference
     private PageAuditConfigService configService;
@@ -156,7 +158,10 @@ public class AiReviewServlet extends HttpServlet {
 
     private String buildUserContent(JSONObject payload) {
         StringBuilder sb = new StringBuilder();
-        sb.append("PAGE LANGUAGE: ").append(payload.optString("language", "en")).append('\n');
+        String pageLanguage = payload.optString("language", "en");
+        String uiLanguage = payload.optString("uiLanguage", pageLanguage);
+        sb.append("REPORT LANGUAGE: ").append(languageName(uiLanguage)).append('\n');
+        sb.append("PAGE LANGUAGE: ").append(pageLanguage).append('\n');
         sb.append("PAGE PATH: ").append(payload.optString("path", "")).append('\n');
         sb.append("TITLE: ").append(payload.optString("title", "")).append('\n');
         sb.append("META DESCRIPTION: ").append(payload.optString("description", "")).append("\n\n");
@@ -179,6 +184,40 @@ public class AiReviewServlet extends HttpServlet {
 
         sb.append("PAGE TEXT:\n").append(text);
         return sb.toString();
+    }
+
+    /** Resolves an ISO code to an explicit language name - models follow "write in French" far more reliably than "write in fr". */
+    private String languageName(String isoCode) {
+        String code = isoCode == null ? "en" : isoCode.toLowerCase();
+        if (code.startsWith("fr")) {
+            return "French";
+        }
+
+        if (code.startsWith("de")) {
+            return "German";
+        }
+
+        if (code.startsWith("es")) {
+            return "Spanish";
+        }
+
+        if (code.startsWith("it")) {
+            return "Italian";
+        }
+
+        if (code.startsWith("pt")) {
+            return "Portuguese";
+        }
+
+        if (code.startsWith("nl")) {
+            return "Dutch";
+        }
+
+        if (code.startsWith("en")) {
+            return "English";
+        }
+
+        return isoCode;
     }
 
     /** Returns {text, inputTokens, outputTokens} extracted from the provider envelope. */

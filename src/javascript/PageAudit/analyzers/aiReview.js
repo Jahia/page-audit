@@ -93,6 +93,9 @@ export function buildDigest(results) {
 export async function requestAiReview({language, path, results, frame}) {
     const payload = {
         language,
+        // Recommendations are written FOR the editor: use the jContent UI
+        // language, falling back to the audited page language
+        uiLanguage: (window.contextJsParameters && window.contextJsParameters.uilang) || language,
         path,
         title: results.seo ? results.seo.title.text : '',
         description: results.seo ? (results.seo.description.text || '') : '',
