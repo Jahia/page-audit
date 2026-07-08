@@ -47,6 +47,14 @@ public class PageAuditConfigService {
         return config.promptAppendix;
     }
 
+    public double getCostInputPerMTokens() {
+        return config.costInputPerMTokens;
+    }
+
+    public double getCostOutputPerMTokens() {
+        return config.costOutputPerMTokens;
+    }
+
     public boolean isAiEnabled() {
         return !config.apiKey.isBlank();
     }
@@ -59,17 +67,22 @@ public class PageAuditConfigService {
         final String apiKey;
         final int maxTokens;
         final String promptAppendix;
+        final double costInputPerMTokens;
+        final double costOutputPerMTokens;
 
-        private Snapshot(String provider, String model, String apiKey, int maxTokens, String promptAppendix) {
+        private Snapshot(String provider, String model, String apiKey, int maxTokens, String promptAppendix,
+                double costInputPerMTokens, double costOutputPerMTokens) {
             this.provider = provider;
             this.model = model;
             this.apiKey = apiKey;
             this.maxTokens = maxTokens;
             this.promptAppendix = promptAppendix;
+            this.costInputPerMTokens = costInputPerMTokens;
+            this.costOutputPerMTokens = costOutputPerMTokens;
         }
 
         static Snapshot defaults() {
-            return new Snapshot("anthropic", "claude-sonnet-5", "", 2048, "");
+            return new Snapshot("anthropic", "claude-sonnet-5", "", 2048, "", 3.0, 15.0);
         }
 
         static Snapshot from(Map<String, Object> p) {
@@ -78,7 +91,9 @@ public class PageAuditConfigService {
                     str(p, "AI_MODEL", "claude-sonnet-5"),
                     str(p, "AI_API_KEY", ""),
                     intVal(p, "AI_MAX_TOKENS", 2048),
-                    str(p, "AI_PROMPT_APPENDIX", "")
+                    str(p, "AI_PROMPT_APPENDIX", ""),
+                    dblVal(p, "AI_COST_INPUT_PER_MTOKENS", 3.0),
+                    dblVal(p, "AI_COST_OUTPUT_PER_MTOKENS", 15.0)
             );
         }
 
@@ -95,6 +110,14 @@ public class PageAuditConfigService {
         private static int intVal(Map<String, Object> m, String key, int def) {
             try {
                 return Integer.parseInt(String.valueOf(m.get(key)));
+            } catch (Exception e) {
+                return def;
+            }
+        }
+
+        private static double dblVal(Map<String, Object> m, String key, double def) {
+            try {
+                return Double.parseDouble(String.valueOf(m.get(key)));
             } catch (Exception e) {
                 return def;
             }

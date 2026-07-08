@@ -33,6 +33,8 @@
             "summary": "Évaluation globale",
             "error": "La revue IA a échoué",
             "poweredBy": "Généré par {{provider}} · {{model}}",
+            "usage": "Tokens : {{input}} entrée / {{output}} sortie",
+            "cost": "Coût estimé : {{cost}} $",
             "disclaimer": "Suggestions générées par IA : à relire avant application.",
             "categories": {
                 "content": "Contenu",

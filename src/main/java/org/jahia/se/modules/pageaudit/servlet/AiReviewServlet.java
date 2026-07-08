@@ -113,10 +113,25 @@ public class AiReviewServlet extends HttpServlet {
         String model = configService.getModel();
 
         try {
-            String rawAnswer = callProvider(provider, model, userContent);
-            JSONObject review = parseReview(rawAnswer);
+            JSONObject providerResult = callProvider(provider, model, userContent);
+            JSONObject review = parseReview(providerResult.getString("text"));
             review.put("provider", provider);
             review.put("model", model);
+
+            long inputTokens = providerResult.optLong("inputTokens", -1);
+            long outputTokens = providerResult.optLong("outputTokens", -1);
+            if (inputTokens >= 0 && outputTokens >= 0) {
+                JSONObject usage = new JSONObject();
+                usage.put("inputTokens", inputTokens);
+                usage.put("outputTokens", outputTokens);
+                // Rates are configured per million tokens (AI_COST_*_PER_MTOKENS)
+                double cost = (inputTokens / 1_000_000.0) * configService.getCostInputPerMTokens()
+                        + (outputTokens / 1_000_000.0) * configService.getCostOutputPerMTokens();
+                usage.put("cost", Math.round(cost * 10_000.0) / 10_000.0);
+                usage.put("currency", "USD");
+                review.put("usage", usage);
+            }
+
             writeJson(res, HttpServletResponse.SC_OK, review);
         } catch (Exception e) {
             logger.error("AI review failed", e);
@@ -151,7 +166,8 @@ public class AiReviewServlet extends HttpServlet {
         return sb.toString();
     }
 
-    private String callProvider(String provider, String model, String userContent) throws IOException {
+    /** Returns {text, inputTokens, outputTokens} extracted from the provider envelope. */
+    private JSONObject callProvider(String provider, String model, String userContent) throws IOException {
         String systemPrompt = SYSTEM_PROMPT;
         String appendix = configService.getPromptAppendix();
         if (!appendix.isBlank()) {
@@ -205,12 +221,24 @@ public class AiReviewServlet extends HttpServlet {
         }
 
         JSONObject envelope = new JSONObject(response);
+        JSONObject result = new JSONObject();
+        JSONObject usage = envelope.optJSONObject("usage");
         if ("anthropic".equalsIgnoreCase(provider)) {
-            return envelope.getJSONArray("content").getJSONObject(0).getString("text");
+            result.put("text", envelope.getJSONArray("content").getJSONObject(0).getString("text"));
+            if (usage != null) {
+                result.put("inputTokens", usage.optLong("input_tokens", -1));
+                result.put("outputTokens", usage.optLong("output_tokens", -1));
+            }
+        } else {
+            result.put("text", envelope.getJSONArray("choices").getJSONObject(0)
+                    .getJSONObject("message").getString("content"));
+            if (usage != null) {
+                result.put("inputTokens", usage.optLong("prompt_tokens", -1));
+                result.put("outputTokens", usage.optLong("completion_tokens", -1));
+            }
         }
 
-        return envelope.getJSONArray("choices").getJSONObject(0)
-                .getJSONObject("message").getString("content");
+        return result;
     }
 
     /**

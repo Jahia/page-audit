@@ -105,6 +105,18 @@ export function AiTab({review, phase, error, onGenerate, onHighlightText}) {
 
                     <p className={styles.note}>
                         {t('ai.poweredBy', {provider: review.provider, model: review.model})}
+                        {review.usage && (
+                            <>
+                                {' · '}
+                                {t('ai.usage', {
+                                    input: review.usage.inputTokens.toLocaleString(),
+                                    output: review.usage.outputTokens.toLocaleString()
+                                })}
+                                {typeof review.usage.cost === 'number' && (
+                                    <> · {t('ai.cost', {cost: review.usage.cost.toFixed(4)})}</>
+                                )}
+                            </>
+                        )}
                         {' · '}{t('ai.disclaimer')}
                     </p>
                 </>
