@@ -1,0 +1,27 @@
+version: 2
+updates:
+  # npm: keeps axe-core (the WCAG rule engine) and other front-end deps current.
+  # New axe rules are picked up automatically because the audit runs by WCAG
+  # tag, not by a hardcoded rule list.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    ignore:
+      # React 18 is a hard constraint: the bundle shares jcontent's React 18
+      # singleton via Module Federation. Never accept a major bump.
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # Maven: the Jahia parent POM and provided Jahia artifacts are pinned to the
+  # platform version and must never be bumped by a bot.
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "org.jahia.modules:jahia-modules"
+      - dependency-name: "org.jahia.server:*"
