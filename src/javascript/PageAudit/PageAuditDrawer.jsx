@@ -151,19 +151,44 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
             }
         }
 
-        const walker = doc.createTreeWalker(doc.body, 4 /* NodeFilter.SHOW_TEXT */);
-        let node = walker.nextNode();
-        while (node) {
-            if ((node.textContent || '').includes(sample) && node.parentElement) {
-                const el = node.parentElement;
-                el.scrollIntoView({behavior: 'smooth', block: 'center'});
-                el.style.outline = '3px solid #e0182d';
-                el.style.outlineOffset = '2px';
-                highlightedRef.current = el;
-                return;
-            }
+        // LLM quotes are approximate: normalize whitespace, apostrophes and
+        // quotes, compare case-insensitively, and search at ELEMENT level so
+        // wording spanning several inline text nodes still matches. Fall back
+        // to the first words of the quote when the full text is not found.
+        const normalize = s => s
+            .replace(/[’‘]/g, '\'')
+            .replace(/[“”«»]/g, '"')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toLowerCase();
 
-            node = walker.nextNode();
+        const fullNeedle = normalize(sample);
+        const words = fullNeedle.split(' ');
+        const needles = [...new Set([
+            fullNeedle,
+            words.slice(0, 8).join(' '),
+            words.slice(0, 4).join(' ')
+        ])].filter(n => n.length >= 3);
+
+        const elements = [...doc.body.querySelectorAll('*')]
+            .filter(el => !['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(el.tagName));
+
+        let target = null;
+        for (const needle of needles) {
+            const matches = elements.filter(el => normalize(el.textContent || '').includes(needle));
+            if (matches.length > 0) {
+                // Tightest container = the match with the least text
+                target = matches.reduce((a, b) =>
+                    ((a.textContent || '').length <= (b.textContent || '').length ? a : b));
+                break;
+            }
+        }
+
+        if (target) {
+            target.scrollIntoView({behavior: 'smooth', block: 'center'});
+            target.style.outline = '3px solid #e0182d';
+            target.style.outlineOffset = '2px';
+            highlightedRef.current = target;
         }
     }, []);
 
