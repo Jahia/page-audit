@@ -1,0 +1,93 @@
+{
+    "page-audit": {
+        "action": {
+            "open": "Audit de page"
+        },
+        "drawer": {
+            "title": "Audit qualité de la page",
+            "close": "Fermer le panneau",
+            "rerun": "Relancer",
+            "export": "Exporter JSON",
+            "preview": "Aperçu de la page",
+            "loading": "Chargement de l'aperçu…",
+            "analyzing": "Analyse de la page…",
+            "error": "L'analyse a échoué"
+        },
+        "tabs": {
+            "accessibility": "Accessibilité",
+            "vitals": "Web Vitals",
+            "readability": "Lisibilité"
+        },
+        "a11y": {
+            "levels": {
+                "A": "WCAG A",
+                "AA": "WCAG AA",
+                "AAA": "WCAG AAA",
+                "BP": "Bonnes pratiques"
+            },
+            "impacts": {
+                "critical": "Critique",
+                "serious": "Sérieux",
+                "moderate": "Modéré",
+                "minor": "Mineur"
+            },
+            "passes": "{{count}} conformes",
+            "incomplete": "{{count}} à vérifier",
+            "noViolations": "Aucune violation détectée par les contrôles automatiques.",
+            "highlight": "Surligner dans l'aperçu",
+            "moreElements": "…et {{count}} éléments supplémentaires",
+            "machineNote": "Les contrôles automatiques couvrent une partie des critères WCAG. Un résultat sans violation ne certifie pas une conformité totale ; une revue manuelle reste nécessaire."
+        },
+        "vitals": {
+            "labNote": "Mesure en laboratoire de ce rendu d'aperçu. Les valeurs sont indicatives et diffèrent des données réelles des visiteurs.",
+            "metrics": {
+                "lcp": "LCP",
+                "fcp": "FCP",
+                "cls": "CLS",
+                "ttfb": "TTFB",
+                "inp": "INP"
+            },
+            "bands": {
+                "good": "Bon",
+                "ni": "À améliorer",
+                "poor": "Faible"
+            },
+            "inpNa": "n/d",
+            "diagnostics": "Diagnostics",
+            "requests": "Requêtes",
+            "weight": "Poids de la page",
+            "domNodes": "Nœuds DOM",
+            "images": "Images",
+            "missingDims": "{{count}} sans width/height",
+            "oversized": "{{count}} surdimensionnées",
+            "largest": "Ressources les plus lourdes"
+        },
+        "readability": {
+            "score": "Score de lisibilité",
+            "bands": {
+                "veryEasy": "Très facile",
+                "easy": "Facile",
+                "standard": "Standard",
+                "difficult": "Difficile",
+                "veryDifficult": "Très difficile"
+            },
+            "gradeLevel": "Niveau scolaire",
+            "readingTime": "Temps de lecture",
+            "minutes": "min",
+            "textStats": "Statistiques du texte",
+            "words": "Mots",
+            "sentences": "Phrases",
+            "avgSentenceLength": "Mots par phrase (moy.)",
+            "longSentences": "Phrases longues (>25 mots)",
+            "longSentencesHint": "envisagez de les découper",
+            "paragraphs": "Paragraphes",
+            "avgWordsPerParagraph": "mots en moy.",
+            "structure": "Structure",
+            "h1Count": "Titres H1",
+            "h1Hint": "une page doit avoir exactement un H1",
+            "headingSkips": "Niveaux de titre sautés",
+            "headingSkipsHint": "évitez de sauter des niveaux (ex. H2 vers H4)",
+            "noText": "Texte insuffisant sur cette page pour calculer la lisibilité ({{count}} mots trouvés)."
+        }
+    }
+}

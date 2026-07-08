@@ -1,0 +1,93 @@
+{
+    "page-audit": {
+        "action": {
+            "open": "Page audit"
+        },
+        "drawer": {
+            "title": "Page Quality Audit",
+            "close": "Close panel",
+            "rerun": "Re-run",
+            "export": "Export JSON",
+            "preview": "Page preview",
+            "loading": "Loading page preview…",
+            "analyzing": "Analyzing page…",
+            "error": "Analysis failed"
+        },
+        "tabs": {
+            "accessibility": "Accessibility",
+            "vitals": "Web Vitals",
+            "readability": "Readability"
+        },
+        "a11y": {
+            "levels": {
+                "A": "WCAG A",
+                "AA": "WCAG AA",
+                "AAA": "WCAG AAA",
+                "BP": "Best practice"
+            },
+            "impacts": {
+                "critical": "Critical",
+                "serious": "Serious",
+                "moderate": "Moderate",
+                "minor": "Minor"
+            },
+            "passes": "{{count}} passed",
+            "incomplete": "{{count}} to verify",
+            "noViolations": "No violations detected by automated checks.",
+            "highlight": "Highlight in preview",
+            "moreElements": "…and {{count}} more elements",
+            "machineNote": "Automated checks cover a subset of WCAG criteria. A clean result does not certify full compliance; manual review is still required for the rest."
+        },
+        "vitals": {
+            "labNote": "Lab measurement of this preview render. Values are directional and differ from real-user (field) data.",
+            "metrics": {
+                "lcp": "LCP",
+                "fcp": "FCP",
+                "cls": "CLS",
+                "ttfb": "TTFB",
+                "inp": "INP"
+            },
+            "bands": {
+                "good": "Good",
+                "ni": "Needs improvement",
+                "poor": "Poor"
+            },
+            "inpNa": "n/a",
+            "diagnostics": "Diagnostics",
+            "requests": "Requests",
+            "weight": "Page weight",
+            "domNodes": "DOM nodes",
+            "images": "Images",
+            "missingDims": "{{count}} without width/height",
+            "oversized": "{{count}} oversized",
+            "largest": "Largest resources"
+        },
+        "readability": {
+            "score": "Readability score",
+            "bands": {
+                "veryEasy": "Very easy",
+                "easy": "Easy",
+                "standard": "Standard",
+                "difficult": "Difficult",
+                "veryDifficult": "Very difficult"
+            },
+            "gradeLevel": "Grade level",
+            "readingTime": "Reading time",
+            "minutes": "min",
+            "textStats": "Text statistics",
+            "words": "Words",
+            "sentences": "Sentences",
+            "avgSentenceLength": "Avg. words per sentence",
+            "longSentences": "Long sentences (>25 words)",
+            "longSentencesHint": "consider splitting them",
+            "paragraphs": "Paragraphs",
+            "avgWordsPerParagraph": "avg. words",
+            "structure": "Structure",
+            "h1Count": "H1 headings",
+            "h1Hint": "a page should have exactly one H1",
+            "headingSkips": "Skipped heading levels",
+            "headingSkipsHint": "avoid jumping levels (e.g. H2 to H4)",
+            "noText": "Not enough text on this page to compute readability ({{count}} words found)."
+        }
+    }
+}
