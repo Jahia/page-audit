@@ -19,7 +19,7 @@
   "dependencies": {
     "@jahia/data-helper": "^1.1.14",
     "@jahia/moonstone": "^2.11.3",
-    "@jahia/ui-extender": "^1.1.1",
+    "@jahia/ui-extender": "^2.0.0",
     "axe-core": "^4.10.2",
     "i18next": "^19.7.0",
     "prop-types": "^15.7.2",
