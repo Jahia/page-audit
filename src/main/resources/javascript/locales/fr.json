@@ -8,6 +8,8 @@
             "close": "Fermer le panneau",
             "rerun": "Relancer",
             "export": "Exporter JSON",
+            "hidePreview": "Masquer l'aperçu",
+            "showPreview": "Afficher l'aperçu",
             "preview": "Aperçu de la page",
             "loading": "Chargement de l'aperçu…",
             "analyzing": "Analyse de la page…",

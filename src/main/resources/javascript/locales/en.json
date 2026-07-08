@@ -8,6 +8,8 @@
             "close": "Close panel",
             "rerun": "Re-run",
             "export": "Export JSON",
+            "hidePreview": "Hide preview",
+            "showPreview": "Show preview",
             "preview": "Page preview",
             "loading": "Loading page preview…",
             "analyzing": "Analyzing page…",

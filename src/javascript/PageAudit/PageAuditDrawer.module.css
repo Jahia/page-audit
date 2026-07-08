@@ -117,6 +117,16 @@
     min-height: 220px;
     border-bottom: 1px solid #e4e4e4;
     background: #f4f6f8;
+    transition: height 0.25s ease, min-height 0.25s ease;
+    overflow: hidden;
+}
+
+/* Collapsed: zero height but the iframe stays mounted - analyzers and
+   element highlighting still need its document */
+.previewCollapsed {
+    height: 0;
+    min-height: 0;
+    border-bottom: none;
 }
 
 .frame {

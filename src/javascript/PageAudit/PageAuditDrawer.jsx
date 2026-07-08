@@ -38,6 +38,9 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
     // loading it while the drawer is still translated off-screen makes Chrome
     // throttle rendering, and FCP/LCP paint entries never fire.
     const [frameVisible, setFrameVisible] = useState(false);
+    // Collapsing hides the preview visually (height 0) but keeps the iframe
+    // mounted - analyzers and highlight still need its document.
+    const [previewCollapsed, setPreviewCollapsed] = useState(false);
     const frameRef = useRef(null);
     const highlightedRef = useRef(null);
 
@@ -51,6 +54,8 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
             setAiReview(null);
             setAiPhase('idle');
             setAiError(null);
+            // Re-runs need a visible frame for paint-dependent measurements
+            setPreviewCollapsed(false);
             highlightedRef.current = null;
             const timer = setTimeout(() => setFrameVisible(true), 400);
             return () => clearTimeout(timer);
@@ -103,6 +108,8 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
             return;
         }
 
+        setPreviewCollapsed(false);
+
         if (highlightedRef.current) {
             try {
                 highlightedRef.current.style.outline = '';
@@ -132,6 +139,8 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
         if (!doc || !doc.body || !sample) {
             return;
         }
+
+        setPreviewCollapsed(false);
 
         if (highlightedRef.current) {
             try {
@@ -226,6 +235,13 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                         <button
                             type="button"
                             className={styles.headerButton}
+                            onClick={() => setPreviewCollapsed(c => !c)}
+                        >
+                            {previewCollapsed ? t('drawer.showPreview') : t('drawer.hidePreview')}
+                        </button>
+                        <button
+                            type="button"
+                            className={styles.headerButton}
                             disabled={status === 'loading' || status === 'analyzing'}
                             onClick={() => setRunId(id => id + 1)}
                         >
@@ -250,7 +266,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                     </div>
                 </header>
 
-                <div className={styles.preview}>
+                <div className={`${styles.preview} ${previewCollapsed ? styles.previewCollapsed : ''}`}>
                     {frameVisible && (
                         <iframe
                             key={runId}
