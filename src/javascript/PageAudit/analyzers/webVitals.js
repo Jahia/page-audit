@@ -1,11 +1,18 @@
 /**
  * Lab measurement of web vitals inside the (same-origin) preview iframe.
  * Uses buffered PerformanceObserver entries, so it can be run after the
- * page has finished loading. INP is not measurable without real user
- * interaction and is reported as null.
+ * page has finished loading. Chrome does not emit paint-timing (FCP) or
+ * LCP entries for iframe documents, so LCP falls back to an approximation
+ * from the largest image in the initial viewport (flagged lcpApprox).
+ * INP is not measurable without real user interaction and is reported
+ * as null.
  */
 
 const OBSERVE_WINDOW_MS = 700;
+
+// Resources injected by the audit itself (axe-core script) must not
+// pollute the page's own stats.
+const SELF_INJECTED = /\/modules\/page-audit\//;
 
 function observeBuffered(win, type) {
     return new Promise(resolve => {
@@ -32,6 +39,12 @@ function observeBuffered(win, type) {
     });
 }
 
+// transferSize is 0 for resources served from the HTTP cache;
+// fall back to the encoded body size so page weight stays meaningful.
+function sizeOf(entry) {
+    return entry.transferSize || entry.encodedBodySize || 0;
+}
+
 function shortName(url) {
     try {
         const clean = url.split('?')[0].split('#')[0];
@@ -51,8 +64,6 @@ export async function runWebVitals(frame) {
     }
 
     const nav = win.performance.getEntriesByType('navigation')[0];
-    const paints = win.performance.getEntriesByType('paint');
-    const fcpEntry = paints.find(p => p.name === 'first-contentful-paint');
 
     const [lcpEntries, shiftEntries] = await Promise.all([
         observeBuffered(win, 'largest-contentful-paint'),
@@ -64,9 +75,38 @@ export async function runWebVitals(frame) {
         .filter(e => !e.hadRecentInput)
         .reduce((sum, e) => sum + e.value, 0);
 
-    const resources = win.performance.getEntriesByType('resource');
-    const totalBytes = resources.reduce((sum, r) => sum + (r.transferSize || 0), 0) +
-        (nav ? (nav.transferSize || 0) : 0);
+    const resources = win.performance.getEntriesByType('resource')
+        .filter(r => !SELF_INJECTED.test(r.name));
+
+    let lcp = lcpEntry ? (lcpEntry.renderTime || lcpEntry.loadTime) : null;
+    let lcpApprox = false;
+    if (lcp === null) {
+        const vw = win.innerWidth;
+        const vh = win.innerHeight;
+        let best = null;
+        Array.from(doc.images || []).forEach(img => {
+            const rect = img.getBoundingClientRect();
+            if (rect.width * rect.height === 0 || rect.top >= vh || rect.bottom <= 0 || rect.left >= vw) {
+                return;
+            }
+
+            const area = Math.min(rect.width, vw) * Math.min(rect.height, vh);
+            if (!best || area > best.area) {
+                best = {area, src: img.currentSrc || img.src};
+            }
+        });
+
+        const bestResource = best && resources.find(r => r.name === best.src);
+        if (bestResource) {
+            lcp = bestResource.responseEnd;
+            lcpApprox = true;
+        } else if (nav && nav.domContentLoadedEventEnd) {
+            lcp = nav.domContentLoadedEventEnd;
+            lcpApprox = true;
+        }
+    }
+    const totalBytes = resources.reduce((sum, r) => sum + sizeOf(r), 0) +
+        (nav ? sizeOf(nav) : 0);
 
     const byType = {};
     resources.forEach(r => {
@@ -75,12 +115,12 @@ export async function runWebVitals(frame) {
     });
 
     const largest = [...resources]
-        .sort((a, b) => (b.transferSize || 0) - (a.transferSize || 0))
+        .sort((a, b) => sizeOf(b) - sizeOf(a))
         .slice(0, 5)
         .map(r => ({
             name: shortName(r.name),
             url: r.name,
-            bytes: r.transferSize || 0,
+            bytes: sizeOf(r),
             type: r.initiatorType || 'other'
         }));
 
@@ -93,8 +133,10 @@ export async function runWebVitals(frame) {
     return {
         metrics: {
             ttfb: nav ? nav.responseStart : null,
-            fcp: fcpEntry ? fcpEntry.startTime : null,
-            lcp: lcpEntry ? (lcpEntry.renderTime || lcpEntry.loadTime) : null,
+            dcl: nav && nav.domContentLoadedEventEnd ? nav.domContentLoadedEventEnd : null,
+            load: nav && nav.loadEventEnd ? nav.loadEventEnd : null,
+            lcp,
+            lcpApprox,
             cls,
             inp: null
         },
@@ -114,7 +156,6 @@ export async function runWebVitals(frame) {
 /** Google thresholds: [good upper bound, needs-improvement upper bound] */
 export const THRESHOLDS = {
     lcp: [2500, 4000],
-    fcp: [1800, 3000],
     cls: [0.1, 0.25],
     ttfb: [800, 1800]
 };

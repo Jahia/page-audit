@@ -16,7 +16,7 @@ export const PageAuditAction = ({path, language, render: Render, ...rest}) => {
     const {checksResult} = useNodeChecks(
         {path: pagePath},
         {
-            showOnNodeTypes: ['jnt:page'],
+            showOnNodeTypes: ['jnt:page','jmix:mainResource'],
             requireModuleInstalledOnSite: ['page-audit']
         }
     );

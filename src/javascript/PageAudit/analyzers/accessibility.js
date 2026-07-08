@@ -1,4 +1,8 @@
-import axe from 'axe-core';
+// axe-core is shipped as a module static resource (copied by webpack) and
+// injected into the preview iframe via <script src>, so it runs in the
+// iframe's own realm. axe.source was removed in axe-core 4.x, so inline
+// source injection is not an option.
+const AXE_URL = '/modules/page-audit/javascript/apps/axe.min.js';
 
 const TAG_SETS = {
     A: ['wcag2a', 'wcag21a'],
@@ -43,6 +47,30 @@ function mapRule(rule) {
     };
 }
 
+function injectAxe(frame) {
+    const win = frame.contentWindow;
+    const doc = frame.contentDocument;
+
+    if (win.axe) {
+        return Promise.resolve(win.axe);
+    }
+
+    return new Promise((resolve, reject) => {
+        const script = doc.createElement('script');
+        script.src = AXE_URL;
+        script.onload = () => {
+            if (win.axe) {
+                resolve(win.axe);
+            } else {
+                reject(new Error('axe-core failed to initialize in the preview frame'));
+            }
+        };
+
+        script.onerror = () => reject(new Error('Could not load axe-core into the preview frame'));
+        doc.head.appendChild(script);
+    });
+}
+
 /**
  * Injects axe-core into the (same-origin) preview iframe and runs the full
  * WCAG A / AA / AAA + best-practice rule set against its document.
@@ -55,15 +83,7 @@ export async function runAccessibility(frame) {
         throw new Error('Preview frame is not accessible');
     }
 
-    if (!win.axe) {
-        const script = doc.createElement('script');
-        script.textContent = axe.source;
-        doc.head.appendChild(script);
-    }
-
-    if (!win.axe) {
-        throw new Error('Could not inject axe-core into the preview frame');
-    }
+    await injectAxe(frame);
 
     const raw = await win.axe.run(doc, {
         runOnly: {type: 'tag', values: ALL_TAGS},

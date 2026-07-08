@@ -78,7 +78,10 @@ module.exports = (env, argv) => {
                 }
             })),
             new CleanWebpackPlugin({verbose: false}),
-            new CopyWebpackPlugin({patterns: [{from: './package.json', to: ''}]})
+            new CopyWebpackPlugin({patterns: [
+                {from: './package.json', to: ''},
+                {from: './node_modules/axe-core/axe.min.js', to: 'axe.min.js'}
+            ]})
         ],
         devtool: (argv && argv.mode === 'production') ? 'source-map' : 'eval-source-map',
         mode: 'development'

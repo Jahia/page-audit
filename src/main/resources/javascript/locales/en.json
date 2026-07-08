@@ -42,11 +42,13 @@
             "labNote": "Lab measurement of this preview render. Values are directional and differ from real-user (field) data.",
             "metrics": {
                 "lcp": "LCP",
-                "fcp": "FCP",
                 "cls": "CLS",
                 "ttfb": "TTFB",
+                "dcl": "DOM ready",
+                "load": "Full load",
                 "inp": "INP"
             },
+            "approx": "estimated",
             "bands": {
                 "good": "Good",
                 "ni": "Needs improvement",

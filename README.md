@@ -5,7 +5,7 @@ Jahia jContent UI extension (OSGi/Maven, React 18, Webpack + Module Federation) 
 | Tab | What it does |
 |---|---|
 | **Accessibility** | axe-core against the full WCAG A / AA / AAA + best-practice rule set. Per-level scorecards, violations grouped by severity, element highlighting in the preview. |
-| **Web Vitals** | Lab measurement via buffered `PerformanceObserver`: TTFB, FCP, LCP, CLS (INP reported as not measurable without interaction), plus diagnostics: page weight, request count, DOM size, image issues, largest resources. |
+| **Web Vitals** | Lab measurement via buffered `PerformanceObserver` and navigation timing: TTFB, DOM ready, full load, CLS, LCP (estimated - Chrome emits no LCP/paint entries in iframes; INP requires interaction), plus diagnostics: page weight, request count, DOM size, image issues, largest resources. |
 | **Readability** | Language-aware scoring: Flesch Reading Ease + Flesch-Kincaid grade (EN), Kandel-Moles adaptation (FR). Sentence/paragraph stats, heading structure checks. |
 
 Results can be re-run and exported as JSON.
@@ -25,7 +25,7 @@ The module must be **enabled on the target site** (Administration > Modules) for
 ## Architecture notes
 
 - The audit runs entirely in the editor's browser against `/cms/render/default/{lang}{path}.html` (default workspace - you audit what you are editing, including unpublished changes).
-- axe-core is injected into the iframe via `axe.source`; the preview iframe is visible (not `display:none`) so paint metrics (FCP/LCP) are real.
+- axe-core ships as a module static resource (`javascript/apps/axe.min.js`) and is injected into the iframe via `<script src>` (`axe.source` was removed in axe-core 4.x).
 - No Java code in this phase. A future PageSpeed Insights proxy (field data for published pages) would follow the OSGi whiteboard servlet + `.cfg` config-service pattern.
 - Automated WCAG checks cover a subset of criteria; the UI states this explicitly and never claims full compliance.
 

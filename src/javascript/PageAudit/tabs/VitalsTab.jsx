@@ -20,7 +20,7 @@ function formatBytes(bytes) {
     return `${Math.round(bytes / 1024)} kB`;
 }
 
-const METRICS = ['lcp', 'fcp', 'cls', 'ttfb', 'inp'];
+const METRICS = ['lcp', 'cls', 'inp', 'ttfb', 'dcl', 'load'];
 
 export function VitalsTab({result}) {
     const {t} = useTranslation('page-audit');
@@ -34,6 +34,7 @@ export function VitalsTab({result}) {
                 {METRICS.map(key => {
                     const value = metrics[key];
                     const band = bandOf(key, value);
+                    const isApprox = key === 'lcp' && metrics.lcpApprox;
                     const display = key === 'cls' ?
                         (value === null ? '-' : value.toFixed(3)) :
                         formatMs(value);
@@ -44,9 +45,14 @@ export function VitalsTab({result}) {
                         >
                             <span className={styles.cardTitle}>{t(`vitals.metrics.${key}`)}</span>
                             <span className={styles.cardValue}>
-                                {key === 'inp' ? t('vitals.inpNa') : display}
+                                {key === 'inp' ? t('vitals.inpNa') : `${isApprox ? '≈ ' : ''}${display}`}
                             </span>
-                            {band && <span className={styles.cardHint}>{t(`vitals.bands.${band}`)}</span>}
+                            {(band || isApprox) && (
+                                <span className={styles.cardHint}>
+                                    {band ? t(`vitals.bands.${band}`) : ''}
+                                    {isApprox ? `${band ? ' · ' : ''}${t('vitals.approx')}` : ''}
+                                </span>
+                            )}
                         </div>
                     );
                 })}

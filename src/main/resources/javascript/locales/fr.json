@@ -42,11 +42,13 @@
             "labNote": "Mesure en laboratoire de ce rendu d'aperçu. Les valeurs sont indicatives et diffèrent des données réelles des visiteurs.",
             "metrics": {
                 "lcp": "LCP",
-                "fcp": "FCP",
                 "cls": "CLS",
                 "ttfb": "TTFB",
+                "dcl": "DOM prêt",
+                "load": "Chargement complet",
                 "inp": "INP"
             },
+            "approx": "estimation",
             "bands": {
                 "good": "Bon",
                 "ni": "À améliorer",

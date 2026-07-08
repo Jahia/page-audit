@@ -19,6 +19,10 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
     const [results, setResults] = useState(null);
     const [error, setError] = useState(null);
     const [runId, setRunId] = useState(0);
+    // The iframe is mounted only once the drawer slide-in transition is done:
+    // loading it while the drawer is still translated off-screen makes Chrome
+    // throttle rendering, and FCP/LCP paint entries never fire.
+    const [frameVisible, setFrameVisible] = useState(false);
     const frameRef = useRef(null);
     const highlightedRef = useRef(null);
 
@@ -30,7 +34,11 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
             setResults(null);
             setError(null);
             highlightedRef.current = null;
+            const timer = setTimeout(() => setFrameVisible(true), 400);
+            return () => clearTimeout(timer);
         }
+
+        setFrameVisible(false);
     }, [isOpen, runId]);
 
     const handleFrameLoad = useCallback(() => {
@@ -42,9 +50,11 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                     throw new Error('Preview frame unavailable');
                 }
 
-                const a11y = await runAccessibility(frame);
+                // Vitals first: axe injection would otherwise appear in the
+                // page's own resource statistics.
                 const vitals = await runWebVitals(frame);
                 const readability = runReadability(frame, language);
+                const a11y = await runAccessibility(frame);
                 setResults({a11y, vitals, readability});
                 setStatus('ready');
             } catch (e) {
@@ -156,7 +166,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                 </header>
 
                 <div className={styles.preview}>
-                    {isOpen && (
+                    {frameVisible && (
                         <iframe
                             key={runId}
                             ref={frameRef}
