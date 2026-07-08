@@ -18,6 +18,8 @@ This module is a **Track 2 OSGi UI extension** (see AIStartupKit CLAUDE.md): Mav
 - GraphQL goes through **jcontent's shared Apollo client**: `@apollo/client` is declared in webpack `shared` with `import: false` (consumed from the host, never bundled), and `useApolloClient()` works in the drawer because `createPortal` preserves React context from the action component.
 - Page-scoped JCR traversal: `descendants(typesFilter: {types: ["jnt:content"]}, recursionTypesFilter: {multi: NONE, types: ["jnt:page"]})` - `multi: NONE` means "recurse into everything EXCEPT these types", which stops at sub-page boundaries. Without it you get the whole subtree of every child page.
 - Untranslated detection flags only nodes whose `translationLanguages` is non-empty but missing an `activeInEdit` site language - nodes with no translation nodes at all simply have no i18n properties (not a defect).
+- **Editor/preview tooling is stripped from the iframe before any analyzer runs** (`analyzers/tooling.js`). jExperience's persona preview is an anchor with CLASS `tst-openPersonaPanel` (not an id) plus `iframe#personas_panel`, injected client-side by wem.js in authoring context. Any new preview widget that pollutes audit results gets its selector added there - one place cleans all six tabs.
+- The drawer refuses to audit a preview that returned HTTP >= 400 (`PerformanceNavigationTiming.responseStatus`) - e.g. a page not available in the audited language renders Jahia's 404 page, and scoring that would be meaningless.
 - All analyzers receive the iframe element and must throw (not silently return) when `contentDocument` is unavailable.
 
 ## Layout
