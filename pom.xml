@@ -14,7 +14,15 @@
     <name>Page Quality Audit</name>
     <version>1.1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <description>jContent UI extension - page quality audit drawer: accessibility (WCAG A to AAA), web vitals, readability.</description>
+    <description>jContent UI extension - page quality audit drawer: accessibility (WCAG A to AAA), SEO, links, content health, web vitals, readability.</description>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <scm>
         <connection>scm:dummy:uri</connection>
