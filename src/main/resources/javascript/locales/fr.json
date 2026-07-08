@@ -11,6 +11,7 @@
             "hidePreview": "Masquer l'aperçu",
             "showPreview": "Afficher l'aperçu",
             "lastAudit": "Dernier audit : {{date}}",
+            "stale": "La page a été modifiée depuis ce dernier audit : les résultats ci-dessous peuvent être obsolètes. Relancez l'audit quand vos corrections sont terminées.",
             "preview": "Aperçu de la page",
             "loading": "Chargement de l'aperçu…",
             "analyzing": "Analyse de la page…",

@@ -7,7 +7,7 @@ import {runWebVitals} from './analyzers/webVitals';
 import {runReadability} from './analyzers/readability';
 import {runSeo} from './analyzers/seo';
 import {runLinks} from './analyzers/links';
-import {runJahiaHealth} from './analyzers/jahiaHealth';
+import {runJahiaHealth, fetchPageLastModified} from './analyzers/jahiaHealth';
 import {removeToolingElements} from './analyzers/tooling';
 import {requestAiReview} from './analyzers/aiReview';
 import {AccessibilityTab} from './tabs/AccessibilityTab';
@@ -84,6 +84,9 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
     const [results, setResults] = useState(null);
     const [error, setError] = useState(null);
     const [auditedAt, setAuditedAt] = useState(null);
+    // True when the page was modified after the cached audit: the old report
+    // stays visible (the editor may be mid-fix) with a re-run notice.
+    const [stale, setStale] = useState(false);
     // Set when results were restored from cache: skips re-analysis on frame load
     const cacheHitRef = useRef(false);
     // AI review state lives here so it survives tab switches
@@ -112,6 +115,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
             highlightedRef.current = null;
 
             const cached = runId === 0 ? loadCachedAudit(path, language) : null;
+            setStale(false);
             if (cached && cached.results) {
                 cacheHitRef.current = true;
                 setResults(cached.results);
@@ -119,6 +123,14 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                 setAiReview(cached.aiReview || null);
                 setAiPhase(cached.aiReview ? 'done' : 'idle');
                 setStatus('ready');
+                // Staleness probe: was the page modified after this audit?
+                if (cached.timestamp) {
+                    fetchPageLastModified(apolloClient, path, language).then(modifiedAt => {
+                        if (modifiedAt && modifiedAt > cached.timestamp) {
+                            setStale(true);
+                        }
+                    });
+                }
             } else {
                 cacheHitRef.current = false;
                 setStatus('loading');
@@ -133,7 +145,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
         }
 
         setFrameVisible(false);
-    }, [isOpen, runId, path, language]);
+    }, [isOpen, runId, path, language, apolloClient]);
 
     const handleFrameLoad = useCallback(() => {
         if (cacheHitRef.current) {
@@ -397,6 +409,19 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                         />
                     )}
                 </div>
+
+                {stale && (
+                    <div className={styles.staleBanner}>
+                        {t('drawer.stale')}
+                        <button
+                            type="button"
+                            className={styles.smallHeaderButton}
+                            onClick={() => setRunId(id => id + 1)}
+                        >
+                            {t('drawer.rerun')}
+                        </button>
+                    </div>
+                )}
 
                 <nav className={styles.tabs}>
                     {tabs.map(tab => (

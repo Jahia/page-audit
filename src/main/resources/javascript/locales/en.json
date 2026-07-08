@@ -11,6 +11,7 @@
             "hidePreview": "Hide preview",
             "showPreview": "Show preview",
             "lastAudit": "Last audit: {{date}}",
+            "stale": "The page has been modified since this audit - the results below may be outdated. Re-run when you are done editing.",
             "preview": "Page preview",
             "loading": "Loading page preview…",
             "analyzing": "Analyzing page…",

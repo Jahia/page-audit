@@ -142,6 +142,35 @@
     background: #fff;
 }
 
+/* Stale-audit notice: old report stays visible, editor decides when to refresh */
+.staleBanner {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 16px;
+    background: #fdf8ec;
+    border-bottom: 1px solid #f5ddb0;
+    color: #b0620d;
+    font-size: 12px;
+}
+
+.smallHeaderButton {
+    border: 1px solid #f5ddb0;
+    background: #fff;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #b0620d;
+    flex-shrink: 0;
+}
+
+.smallHeaderButton:hover {
+    background: #fdf3da;
+}
+
 /* Tabs */
 .tabs {
     display: flex;
