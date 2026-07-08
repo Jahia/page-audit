@@ -34,6 +34,7 @@
             "error": "La revue IA a échoué",
             "poweredBy": "Généré par {{provider}} · {{model}}",
             "usage": "Tokens : {{input}} entrée / {{output}} sortie",
+            "truncated": "La réponse a été coupée par la limite AI_MAX_TOKENS : certaines recommandations peuvent manquer. Demandez à un administrateur d'augmenter AI_MAX_TOKENS dans la configuration du module.",
             "cost": "Coût estimé : {{cost}} $",
             "disclaimer": "Suggestions générées par IA : à relire avant application.",
             "categories": {

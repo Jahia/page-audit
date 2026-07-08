@@ -127,6 +127,11 @@ public class AiReviewServlet extends HttpServlet {
             JSONObject review = parseReview(providerResult.getString("text"));
             review.put("provider", provider);
             review.put("model", model);
+            if (providerResult.optBoolean("truncated", false)) {
+                review.put("truncated", true);
+                logger.warn("AI review answer truncated by AI_MAX_TOKENS ({}); complete recommendations were salvaged",
+                        configService.getMaxTokens());
+            }
 
             long inputTokens = providerResult.optLong("inputTokens", -1);
             long outputTokens = providerResult.optLong("outputTokens", -1);
@@ -235,13 +240,15 @@ public class AiReviewServlet extends HttpServlet {
         JSONObject usage = envelope.optJSONObject("usage");
         if ("anthropic".equalsIgnoreCase(provider)) {
             result.put("text", envelope.getJSONArray("content").getJSONObject(0).getString("text"));
+            result.put("truncated", "max_tokens".equals(envelope.optString("stop_reason")));
             if (usage != null) {
                 result.put("inputTokens", usage.optLong("input_tokens", -1));
                 result.put("outputTokens", usage.optLong("output_tokens", -1));
             }
         } else {
-            result.put("text", envelope.getJSONArray("choices").getJSONObject(0)
-                    .getJSONObject("message").getString("content"));
+            JSONObject choice = envelope.getJSONArray("choices").getJSONObject(0);
+            result.put("text", choice.getJSONObject("message").getString("content"));
+            result.put("truncated", "length".equals(choice.optString("finish_reason")));
             if (usage != null) {
                 result.put("inputTokens", usage.optLong("prompt_tokens", -1));
                 result.put("outputTokens", usage.optLong("completion_tokens", -1));
@@ -259,12 +266,11 @@ public class AiReviewServlet extends HttpServlet {
     private JSONObject parseReview(String rawAnswer) {
         String cleaned = rawAnswer.trim();
         int start = cleaned.indexOf('{');
-        int end = cleaned.lastIndexOf('}');
-        if (start < 0 || end <= start) {
+        if (start < 0) {
             throw new IllegalStateException("model did not return JSON");
         }
 
-        JSONObject parsed = new JSONObject(cleaned.substring(start, end + 1));
+        JSONObject parsed = parseLenient(cleaned.substring(start));
 
         JSONObject safe = new JSONObject();
         safe.put("summary", parsed.optString("summary", ""));
@@ -293,6 +299,34 @@ public class AiReviewServlet extends HttpServlet {
 
         safe.put("recommendations", safeRecs);
         return safe;
+    }
+
+    /**
+     * Parses the model JSON, salvaging answers truncated by the max_tokens
+     * limit: cut back to the last complete recommendation object and close
+     * the array and root object. Complete recommendations are recovered
+     * instead of failing the whole review.
+     */
+    private JSONObject parseLenient(String raw) {
+        int end = raw.lastIndexOf('}');
+        if (end > 0) {
+            try {
+                return new JSONObject(raw.substring(0, end + 1));
+            } catch (Exception e) {
+                // Fall through to truncation salvage
+            }
+        }
+
+        int idx = raw.lastIndexOf("},");
+        while (idx > 0) {
+            try {
+                return new JSONObject(raw.substring(0, idx + 1) + "]}");
+            } catch (Exception e) {
+                idx = raw.lastIndexOf("},", idx - 1);
+            }
+        }
+
+        throw new IllegalStateException("model returned malformed JSON");
     }
 
     private String normalize(String value, String[] allowed, String fallback) {

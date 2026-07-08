@@ -82,7 +82,7 @@ public class PageAuditConfigService {
         }
 
         static Snapshot defaults() {
-            return new Snapshot("anthropic", "claude-sonnet-5", "", 2048, "", 3.0, 15.0);
+            return new Snapshot("anthropic", "claude-sonnet-5", "", 4096, "", 3.0, 15.0);
         }
 
         static Snapshot from(Map<String, Object> p) {
@@ -90,7 +90,7 @@ public class PageAuditConfigService {
                     str(p, "AI_PROVIDER", "anthropic"),
                     str(p, "AI_MODEL", "claude-sonnet-5"),
                     str(p, "AI_API_KEY", ""),
-                    intVal(p, "AI_MAX_TOKENS", 2048),
+                    intVal(p, "AI_MAX_TOKENS", 4096),
                     str(p, "AI_PROMPT_APPENDIX", ""),
                     dblVal(p, "AI_COST_INPUT_PER_MTOKENS", 3.0),
                     dblVal(p, "AI_COST_OUTPUT_PER_MTOKENS", 15.0)

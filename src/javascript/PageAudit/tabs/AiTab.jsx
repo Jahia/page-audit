@@ -64,6 +64,9 @@ export function AiTab({review, phase, error, onGenerate, onHighlightText}) {
 
             {review && (
                 <>
+                    {review.truncated && (
+                        <p className={styles.warn}>{t('ai.truncated')}</p>
+                    )}
                     {review.summary && (
                         <>
                             <h4 className={styles.sectionTitle}>{t('ai.summary')}</h4>
