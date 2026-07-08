@@ -87,7 +87,7 @@ export async function runAccessibility(frame) {
 
     const raw = await win.axe.run(doc, {
         runOnly: {type: 'tag', values: ALL_TAGS},
-        resultTypes: ['violations', 'passes', 'incomplete']
+        resultTypes: ['violations', 'passes', 'incomplete', 'inapplicable']
     });
 
     const violations = raw.violations.map(mapRule)
@@ -109,6 +109,8 @@ export async function runAccessibility(frame) {
         violations,
         incomplete,
         passCount: raw.passes.length,
+        rulesRun: raw.violations.length + raw.passes.length + raw.incomplete.length +
+            (raw.inapplicable ? raw.inapplicable.length : 0),
         engine: `axe-core ${raw.testEngine ? raw.testEngine.version : ''}`.trim()
     };
 }

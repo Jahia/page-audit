@@ -203,7 +203,73 @@
             "noViolations": "No violations detected by automated checks.",
             "highlight": "Highlight in preview",
             "moreElements": "…and {{count}} more elements",
-            "machineNote": "Automated checks cover a subset of WCAG criteria. A clean result does not certify full compliance; manual review is still required for the rest."
+            "machineNote": "Automated checks cover a subset of WCAG criteria. A clean result does not certify full compliance; the manual checklist below covers the rest.",
+            "engineInfo": "Engine: {{engine}} · {{rules}} rules executed · {{passes}} passed",
+            "needsReview": "To verify",
+            "incompleteTitle": "Automated checks needing human review",
+            "incompleteNote": "The engine suspects an issue here but cannot decide automatically - review each case.",
+            "checklist": {
+                "title": "Manual checklist (not automatable)",
+                "intro": "These WCAG criteria require human judgment - no tool can verify them. Review them once per page type or template.",
+                "items": {
+                    "keyboard": {
+                        "title": "Everything operable with the keyboard alone",
+                        "detail": "Tab / Shift+Tab through the page: every menu, carousel, accordion and dialog must be reachable and usable, with no focus trap (WCAG 2.1.1, 2.1.2)."
+                    },
+                    "altQuality": {
+                        "title": "Alt texts are meaningful",
+                        "detail": "The tool checks that alt exists - only you can judge if it describes the image. Decorative images should have an empty alt (WCAG 1.1.1)."
+                    },
+                    "media": {
+                        "title": "Videos have captions, audio has transcripts",
+                        "detail": "And the captions are accurate, not just auto-generated noise (WCAG 1.2.1-1.2.3)."
+                    },
+                    "focusOrder": {
+                        "title": "Focus and reading order match the visual order",
+                        "detail": "Tab through the page: the focus must move in the order a sighted reader would scan it (WCAG 1.3.2, 2.4.3)."
+                    },
+                    "linkPurpose": {
+                        "title": "Every link makes sense out of context",
+                        "detail": "A screen reader user often lists all links: each label alone must say where it leads (WCAG 2.4.4)."
+                    },
+                    "zoom": {
+                        "title": "Page usable at 200% zoom",
+                        "detail": "Ctrl/Cmd + until 200%: no text loss, no overlapping content (WCAG 1.4.4)."
+                    },
+                    "reflow": {
+                        "title": "Content reflows at 320 px width",
+                        "detail": "Narrow the window (or use the mobile preview): no horizontal scrolling of the page body (WCAG 1.4.10)."
+                    },
+                    "focusVisible": {
+                        "title": "Keyboard focus is always visible",
+                        "detail": "While tabbing, you must always see where you are - no invisible focus states (WCAG 2.4.7)."
+                    },
+                    "formErrors": {
+                        "title": "Form errors are explained and fixable",
+                        "detail": "Errors are identified in text (not color alone) and suggest a correction (WCAG 3.3.1, 3.3.3)."
+                    },
+                    "consistency": {
+                        "title": "Navigation and components consistent across pages",
+                        "detail": "Menus, search, breadcrumbs appear in the same place and behave the same on every page (WCAG 3.2.3, 3.2.4)."
+                    },
+                    "readingLevel": {
+                        "title": "Text understandable at lower-secondary reading level",
+                        "detail": "Use the Readability tab as a proxy, then judge jargon and sentence complexity yourself (WCAG 3.1.5)."
+                    },
+                    "timing": {
+                        "title": "No time limits, or they can be turned off",
+                        "detail": "Sessions, carousels or forms must not expire without warning and control (WCAG 2.2.3)."
+                    },
+                    "targetSize": {
+                        "title": "Touch targets at least 44×44 px",
+                        "detail": "Buttons and links comfortably tappable on mobile, with spacing between them (WCAG 2.5.5)."
+                    },
+                    "contextHelp": {
+                        "title": "Context-sensitive help available",
+                        "detail": "Complex forms offer inline help or instructions where the user needs them (WCAG 3.3.5)."
+                    }
+                }
+            }
         },
         "vitals": {
             "labNote": "Lab measurement of this preview render. Values are directional and differ from real-user (field) data.",

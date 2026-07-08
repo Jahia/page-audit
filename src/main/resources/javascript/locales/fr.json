@@ -203,7 +203,73 @@
             "noViolations": "Aucune violation détectée par les contrôles automatiques.",
             "highlight": "Surligner dans l'aperçu",
             "moreElements": "…et {{count}} éléments supplémentaires",
-            "machineNote": "Les contrôles automatiques couvrent une partie des critères WCAG. Un résultat sans violation ne certifie pas une conformité totale ; une revue manuelle reste nécessaire."
+            "machineNote": "Les contrôles automatiques couvrent une partie des critères WCAG. Un résultat sans violation ne certifie pas une conformité totale ; la liste de vérification manuelle ci-dessous couvre le reste.",
+            "engineInfo": "Moteur : {{engine}} · {{rules}} règles exécutées · {{passes}} conformes",
+            "needsReview": "À vérifier",
+            "incompleteTitle": "Contrôles automatiques nécessitant une revue humaine",
+            "incompleteNote": "Le moteur soupçonne un problème mais ne peut pas trancher automatiquement : examinez chaque cas.",
+            "checklist": {
+                "title": "Liste de vérification manuelle (non automatisable)",
+                "intro": "Ces critères WCAG demandent un jugement humain : aucun outil ne peut les vérifier. Passez-les en revue une fois par type de page ou de gabarit.",
+                "items": {
+                    "keyboard": {
+                        "title": "Tout est utilisable au clavier seul",
+                        "detail": "Tab / Maj+Tab sur toute la page : chaque menu, carrousel, accordéon et dialogue doit être atteignable et utilisable, sans piège de focus (WCAG 2.1.1, 2.1.2)."
+                    },
+                    "altQuality": {
+                        "title": "Les textes alt sont porteurs de sens",
+                        "detail": "L'outil vérifie que l'alt existe ; vous seul pouvez juger s'il décrit l'image. Les images décoratives doivent avoir un alt vide (WCAG 1.1.1)."
+                    },
+                    "media": {
+                        "title": "Les vidéos ont des sous-titres, l'audio une transcription",
+                        "detail": "Et les sous-titres sont exacts, pas seulement générés automatiquement (WCAG 1.2.1-1.2.3)."
+                    },
+                    "focusOrder": {
+                        "title": "L'ordre de focus et de lecture suit l'ordre visuel",
+                        "detail": "Parcourez la page au Tab : le focus doit avancer dans l'ordre où un lecteur voyant balaie la page (WCAG 1.3.2, 2.4.3)."
+                    },
+                    "linkPurpose": {
+                        "title": "Chaque lien est compréhensible hors contexte",
+                        "detail": "Un utilisateur de lecteur d'écran liste souvent tous les liens : chaque libellé seul doit dire où il mène (WCAG 2.4.4)."
+                    },
+                    "zoom": {
+                        "title": "Page utilisable à 200 % de zoom",
+                        "detail": "Ctrl/Cmd + jusqu'à 200 % : aucune perte de texte, aucun chevauchement (WCAG 1.4.4)."
+                    },
+                    "reflow": {
+                        "title": "Le contenu se réorganise à 320 px de large",
+                        "detail": "Rétrécissez la fenêtre (ou utilisez l'aperçu mobile) : pas de défilement horizontal du corps de page (WCAG 1.4.10)."
+                    },
+                    "focusVisible": {
+                        "title": "Le focus clavier est toujours visible",
+                        "detail": "En tabulant, vous devez toujours voir où vous êtes : pas d'état de focus invisible (WCAG 2.4.7)."
+                    },
+                    "formErrors": {
+                        "title": "Les erreurs de formulaire sont expliquées et corrigeables",
+                        "detail": "Les erreurs sont signalées en texte (pas seulement par la couleur) et proposent une correction (WCAG 3.3.1, 3.3.3)."
+                    },
+                    "consistency": {
+                        "title": "Navigation et composants cohérents entre les pages",
+                        "detail": "Menus, recherche, fil d'Ariane apparaissent au même endroit et se comportent pareil sur chaque page (WCAG 3.2.3, 3.2.4)."
+                    },
+                    "readingLevel": {
+                        "title": "Texte compréhensible au niveau collège",
+                        "detail": "Utilisez l'onglet Lisibilité comme indicateur, puis jugez vous-même le jargon et la complexité des phrases (WCAG 3.1.5)."
+                    },
+                    "timing": {
+                        "title": "Pas de limite de temps, ou désactivable",
+                        "detail": "Sessions, carrousels ou formulaires ne doivent pas expirer sans avertissement ni contrôle (WCAG 2.2.3)."
+                    },
+                    "targetSize": {
+                        "title": "Cibles tactiles d'au moins 44×44 px",
+                        "detail": "Boutons et liens confortablement cliquables sur mobile, avec de l'espacement entre eux (WCAG 2.5.5)."
+                    },
+                    "contextHelp": {
+                        "title": "Aide contextuelle disponible",
+                        "detail": "Les formulaires complexes offrent une aide ou des instructions là où l'utilisateur en a besoin (WCAG 3.3.5)."
+                    }
+                }
+            }
         },
         "vitals": {
             "labNote": "Mesure en laboratoire de ce rendu d'aperçu. Les valeurs sont indicatives et diffèrent des données réelles des visiteurs.",

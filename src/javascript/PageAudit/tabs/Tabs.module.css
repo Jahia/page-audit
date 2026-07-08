@@ -138,6 +138,11 @@
     color: #131c21;
 }
 
+.impact_review {
+    background: #e3edf7;
+    color: #1a5b96;
+}
+
 .levelChip {
     font-size: 10px;
     font-weight: 700;
