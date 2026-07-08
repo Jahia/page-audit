@@ -59,7 +59,21 @@ export function runReadability(frame, language) {
     const clone = rootEl.cloneNode(true);
     clone.querySelectorAll('script,style,noscript,svg,nav,header,footer,[aria-hidden="true"]')
         .forEach(node => node.remove());
-    const text = (clone.textContent || '').replace(/\s+/g, ' ').trim();
+    // Join text nodes with spaces - textContent merges adjacent block
+    // elements into single "words", skewing word and sentence counts
+    const parts = [];
+    const walker = doc.createTreeWalker(clone, 4 /* NodeFilter.SHOW_TEXT */);
+    let textNode = walker.nextNode();
+    while (textNode) {
+        const t = textNode.textContent.trim();
+        if (t) {
+            parts.push(t);
+        }
+
+        textNode = walker.nextNode();
+    }
+
+    const text = parts.join(' ').replace(/\s+/g, ' ').trim();
 
     const sentences = text.split(/[.!?…]+(?:\s|$)/)
         .map(s => s.trim())

@@ -26,7 +26,22 @@ export function extractPageText(frame) {
     const clone = rootEl.cloneNode(true);
     clone.querySelectorAll('script,style,noscript,svg,nav,header,footer,[aria-hidden="true"]')
         .forEach(node => node.remove());
-    return (clone.textContent || '').replace(/\s+/g, ' ').trim();
+    // Join text nodes with spaces: textContent concatenates adjacent block
+    // elements without separators, which reads as "missing spaces" / merged
+    // words to the LLM and to the readability word counter.
+    const parts = [];
+    const walker = doc.createTreeWalker(clone, 4 /* NodeFilter.SHOW_TEXT */);
+    let node = walker.nextNode();
+    while (node) {
+        const text = node.textContent.trim();
+        if (text) {
+            parts.push(text);
+        }
+
+        node = walker.nextNode();
+    }
+
+    return parts.join(' ').replace(/\s+/g, ' ').trim();
 }
 
 export function buildDigest(results) {

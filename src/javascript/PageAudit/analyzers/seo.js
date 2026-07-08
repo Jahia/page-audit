@@ -28,7 +28,10 @@ export function runSeo(frame, language) {
         return el ? (el.getAttribute('content') || '').trim() : null;
     };
 
-    const title = (doc.title || '').trim();
+    // The default-workspace render prefixes the title with Jahia's preview
+    // label ("Aperçu - ", "Preview - "…) - not part of the real page title.
+    const title = (doc.title || '').trim()
+        .replace(/^(aperçu|preview|vorschau|anteprima|vista previa)\s*[-–:]\s*/i, '');
     const description = meta('description');
     const robots = (meta('robots') || '').toLowerCase();
     const canonicalEl = doc.querySelector('link[rel="canonical"]');

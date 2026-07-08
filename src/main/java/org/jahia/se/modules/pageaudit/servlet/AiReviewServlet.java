@@ -57,7 +57,16 @@ public class AiReviewServlet extends HttpServlet {
             + "(accessibility, SEO, links, performance, readability, publication state). "
             + "Give recommendations a content editor can act on, preferring fixes that need no development work. "
             + "Do not repeat raw audit findings verbatim: prioritize them, connect them, and add what automated "
-            + "tools cannot see (content quality, wording, trust, consistency, conversion, structure). "
+            + "tools cannot see. Actively check these dimensions the automated audit cannot cover:\n"
+            + "- proofreading: typos, grammar, punctuation, capitalization mistakes (quote the exact wording)\n"
+            + "- factuality: outdated or contradictory content - past dates presented as upcoming, stale years, "
+            + "claims that contradict other parts of the page\n"
+            + "- consistency: terminology drift (same product/name spelled differently), inconsistent date/number "
+            + "formats, inconsistent heading capitalization\n"
+            + "- conversion: missing or weak calls to action, vague button labels, no clear next step for the visitor\n"
+            + "- localization: fragments in the wrong language for the page, machine-translation artifacts, "
+            + "untranslated visible strings\n"
+            + "- legal: unsubstantiated superlative claims, missing legal mentions, risky wording\n"
             + "Do not invent issues.\n\n"
             + "Reply ONLY with a valid JSON object. No markdown, no code fences, no comments, no trailing commas.\n"
             + "JSON structure:\n"
@@ -66,14 +75,15 @@ public class AiReviewServlet extends HttpServlet {
             + "  \"recommendations\": [\n"
             + "    {\n"
             + "      \"severity\": \"critical\" | \"serious\" | \"moderate\" | \"minor\",\n"
-            + "      \"category\": \"content\" | \"seo\" | \"accessibility\" | \"performance\" | \"ux\",\n"
+            + "      \"category\": \"content\" | \"seo\" | \"accessibility\" | \"performance\" | \"ux\" | "
+            + "\"proofreading\" | \"factuality\" | \"consistency\" | \"conversion\" | \"localization\" | \"legal\",\n"
             + "      \"title\": \"short actionable title\",\n"
             + "      \"detail\": \"1-3 sentences: why it matters and how to fix it\",\n"
             + "      \"wording\": \"exact text quoted from the page when the issue concerns specific wording, else empty string\"\n"
             + "    }\n"
             + "  ]\n"
             + "}\n"
-            + "Maximum 12 recommendations, most important first. "
+            + "Maximum 15 recommendations, most important first. "
             + "Write every user-facing string (summary, title, detail) in the language whose ISO code is given as PAGE LANGUAGE.";
 
     @Reference
@@ -271,7 +281,9 @@ public class AiReviewServlet extends HttpServlet {
                 safeRec.put("severity", normalize(r.optString("severity", "moderate"),
                         new String[]{"critical", "serious", "moderate", "minor"}, "moderate"));
                 safeRec.put("category", normalize(r.optString("category", "content"),
-                        new String[]{"content", "seo", "accessibility", "performance", "ux"}, "content"));
+                        new String[]{"content", "seo", "accessibility", "performance", "ux",
+                                "proofreading", "factuality", "consistency", "conversion",
+                                "localization", "legal"}, "content"));
                 safeRec.put("title", r.optString("title", ""));
                 safeRec.put("detail", r.optString("detail", ""));
                 safeRec.put("wording", r.optString("wording", ""));

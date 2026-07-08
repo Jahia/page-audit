@@ -41,7 +41,13 @@
                 "seo": "SEO",
                 "accessibility": "Accessibilité",
                 "performance": "Performance",
-                "ux": "UX"
+                "ux": "UX",
+                "proofreading": "Orthographe",
+                "factuality": "Exactitude",
+                "consistency": "Cohérence",
+                "conversion": "Conversion",
+                "localization": "Localisation",
+                "legal": "Juridique"
             }
         },
         "jahia": {
