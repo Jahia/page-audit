@@ -71,6 +71,12 @@
     max-width: 340px;
 }
 
+.lastAudit {
+    font-size: 11px;
+    color: #6b7a86;
+    white-space: nowrap;
+}
+
 .headerActions {
     display: flex;
     align-items: center;

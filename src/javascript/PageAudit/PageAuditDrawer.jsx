@@ -22,6 +22,60 @@ import styles from './PageAuditDrawer.module.css';
 // Let client islands hydrate and layout settle before measuring
 const SETTLE_MS = 2500;
 
+// Results are cached per page+language in localStorage so reopening the
+// drawer restores the last audit instantly (with its timestamp shown in the
+// header). "Re-run" always performs a fresh audit. LRU-capped.
+const CACHE_PREFIX = 'page-audit:';
+const CACHE_MAX_ENTRIES = 10;
+
+const cacheKey = (path, language) => `${CACHE_PREFIX}${language}:${path}`;
+
+function loadCachedAudit(path, language) {
+    try {
+        const raw = window.localStorage.getItem(cacheKey(path, language));
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function pruneCache(keep) {
+    try {
+        const entries = Object.keys(window.localStorage)
+            .filter(k => k.startsWith(CACHE_PREFIX))
+            .map(k => {
+                let timestamp = 0;
+                try {
+                    timestamp = JSON.parse(window.localStorage.getItem(k)).timestamp || 0;
+                } catch (e) {
+                    // Unparseable entry: treat as oldest
+                }
+
+                return {k, timestamp};
+            })
+            .sort((a, b) => b.timestamp - a.timestamp);
+        entries.slice(keep).forEach(e => window.localStorage.removeItem(e.k));
+    } catch (e) {
+        // localStorage unavailable
+    }
+}
+
+function saveCachedAudit(path, language, entry) {
+    const write = () => window.localStorage.setItem(cacheKey(path, language), JSON.stringify(entry));
+    try {
+        write();
+        pruneCache(CACHE_MAX_ENTRIES);
+    } catch (e) {
+        // Quota exceeded: evict everything but the most recent and retry once
+        pruneCache(2);
+        try {
+            write();
+        } catch (e2) {
+            // Give up silently - caching is best-effort
+        }
+    }
+}
+
 export function PageAuditDrawer({isOpen, onClose, path, language}) {
     const {t} = useTranslation('page-audit');
     const apolloClient = useApolloClient();
@@ -29,6 +83,9 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
     const [status, setStatus] = useState('idle');
     const [results, setResults] = useState(null);
     const [error, setError] = useState(null);
+    const [auditedAt, setAuditedAt] = useState(null);
+    // Set when results were restored from cache: skips re-analysis on frame load
+    const cacheHitRef = useRef(false);
     // AI review state lives here so it survives tab switches
     const [aiReview, setAiReview] = useState(null);
     const [aiPhase, setAiPhase] = useState('idle');
@@ -48,23 +105,43 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
 
     useEffect(() => {
         if (isOpen) {
-            setStatus('loading');
-            setResults(null);
             setError(null);
-            setAiReview(null);
-            setAiPhase('idle');
             setAiError(null);
             // Re-runs need a visible frame for paint-dependent measurements
             setPreviewCollapsed(false);
             highlightedRef.current = null;
+
+            const cached = runId === 0 ? loadCachedAudit(path, language) : null;
+            if (cached && cached.results) {
+                cacheHitRef.current = true;
+                setResults(cached.results);
+                setAuditedAt(cached.timestamp || null);
+                setAiReview(cached.aiReview || null);
+                setAiPhase(cached.aiReview ? 'done' : 'idle');
+                setStatus('ready');
+            } else {
+                cacheHitRef.current = false;
+                setStatus('loading');
+                setResults(null);
+                setAuditedAt(null);
+                setAiReview(null);
+                setAiPhase('idle');
+            }
+
             const timer = setTimeout(() => setFrameVisible(true), 400);
             return () => clearTimeout(timer);
         }
 
         setFrameVisible(false);
-    }, [isOpen, runId]);
+    }, [isOpen, runId, path, language]);
 
     const handleFrameLoad = useCallback(() => {
+        if (cacheHitRef.current) {
+            // Results restored from cache: the frame is only a preview /
+            // highlight target, no re-analysis
+            return;
+        }
+
         setStatus('analyzing');
         setTimeout(async () => {
             const frame = frameRef.current;
@@ -92,7 +169,11 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                 const a11y = await runAccessibility(frame);
                 const links = await runLinks(frame);
                 const jahia = await runJahiaHealth(frame, {client: apolloClient, path, language});
-                setResults({a11y, vitals, readability, seo, links, jahia});
+                const newResults = {a11y, vitals, readability, seo, links, jahia};
+                const timestamp = Date.now();
+                setResults(newResults);
+                setAuditedAt(timestamp);
+                saveCachedAudit(path, language, {timestamp, results: newResults});
                 setStatus('ready');
             } catch (e) {
                 console.error('[page-audit] analysis failed', e);
@@ -208,26 +289,31 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
             });
             setAiReview(review);
             setAiPhase('done');
+            saveCachedAudit(path, language, {
+                timestamp: auditedAt || Date.now(),
+                results,
+                aiReview: review
+            });
         } catch (e) {
             console.error('[page-audit] AI review failed', e);
             setAiError(e.message);
             setAiPhase('error');
         }
-    }, [results, language, path]);
+    }, [results, language, path, auditedAt]);
 
     const exportJson = useCallback(() => {
         if (!results) {
             return;
         }
 
-        const payload = {path, language, url: previewUrl.split('?')[0], results};
+        const payload = {path, language, url: previewUrl.split('?')[0], auditedAt, results};
         const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `page-audit-${path.split('/').filter(Boolean).pop() || 'page'}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
-    }, [results, path, language, previewUrl]);
+    }, [results, path, language, previewUrl, auditedAt]);
 
     // Badges all mean the same thing: number of issues to review in that tab.
     const tabs = [
@@ -255,6 +341,14 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                     <div className={styles.headerText}>
                         <span className={styles.title}>{t('drawer.title')}</span>
                         <span className={styles.path} title={path}>{path}</span>
+                        {auditedAt && (
+                            <span className={styles.lastAudit}>
+                                {t('drawer.lastAudit', {
+                                    date: new Date(auditedAt).toLocaleString(
+                                        language === 'fr' ? 'fr-FR' : language)
+                                })}
+                            </span>
+                        )}
                     </div>
                     <div className={styles.headerActions}>
                         <button

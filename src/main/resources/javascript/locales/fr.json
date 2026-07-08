@@ -10,6 +10,7 @@
             "export": "Exporter JSON",
             "hidePreview": "Masquer l'aperçu",
             "showPreview": "Afficher l'aperçu",
+            "lastAudit": "Dernier audit : {{date}}",
             "preview": "Aperçu de la page",
             "loading": "Chargement de l'aperçu…",
             "analyzing": "Analyse de la page…",
