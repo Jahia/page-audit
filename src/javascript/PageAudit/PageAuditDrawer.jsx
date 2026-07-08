@@ -4,9 +4,13 @@ import {useTranslation} from 'react-i18next';
 import {runAccessibility} from './analyzers/accessibility';
 import {runWebVitals} from './analyzers/webVitals';
 import {runReadability} from './analyzers/readability';
+import {runSeo} from './analyzers/seo';
+import {runLinks} from './analyzers/links';
 import {AccessibilityTab} from './tabs/AccessibilityTab';
 import {VitalsTab} from './tabs/VitalsTab';
 import {ReadabilityTab} from './tabs/ReadabilityTab';
+import {SeoTab} from './tabs/SeoTab';
+import {LinksTab} from './tabs/LinksTab';
 import styles from './PageAuditDrawer.module.css';
 
 // Let client islands hydrate and layout settle before measuring
@@ -50,12 +54,14 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                     throw new Error('Preview frame unavailable');
                 }
 
-                // Vitals first: axe injection would otherwise appear in the
-                // page's own resource statistics.
+                // Vitals first: axe injection and link checks would otherwise
+                // appear in the page's own resource statistics.
                 const vitals = await runWebVitals(frame);
                 const readability = runReadability(frame, language);
+                const seo = runSeo(frame, language);
                 const a11y = await runAccessibility(frame);
-                setResults({a11y, vitals, readability});
+                const links = await runLinks(frame);
+                setResults({a11y, vitals, readability, seo, links});
                 setStatus('ready');
             } catch (e) {
                 console.error('[page-audit] analysis failed', e);
@@ -112,6 +118,8 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
     // Badges all mean the same thing: number of issues to review in that tab.
     const tabs = [
         {key: 'accessibility', label: t('tabs.accessibility'), badge: results ? results.a11y.violations.length : null},
+        {key: 'seo', label: t('tabs.seo'), badge: results ? results.seo.recommendations.length : null},
+        {key: 'links', label: t('tabs.links'), badge: results ? results.links.recommendations.length : null},
         {key: 'vitals', label: t('tabs.vitals'), badge: results ? results.vitals.recommendations.length : null},
         {key: 'readability', label: t('tabs.readability'), badge: results ? results.readability.recommendations.length : null}
     ];
@@ -203,6 +211,10 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                         <>
                             {activeTab === 'accessibility' &&
                                 <AccessibilityTab result={results.a11y} onHighlight={highlight}/>}
+                            {activeTab === 'seo' &&
+                                <SeoTab result={results.seo}/>}
+                            {activeTab === 'links' &&
+                                <LinksTab result={results.links} onHighlight={highlight}/>}
                             {activeTab === 'vitals' &&
                                 <VitalsTab result={results.vitals}/>}
                             {activeTab === 'readability' &&

@@ -15,9 +15,130 @@
         },
         "tabs": {
             "accessibility": "Accessibility",
+            "seo": "SEO",
+            "links": "Links",
             "vitals": "Web Vitals",
             "readability": "Readability",
             "badgeTooltip": "{{count}} issues to review"
+        },
+        "seo": {
+            "preview": "Social sharing preview",
+            "noPreview": "No title or og:title found - nothing to preview.",
+            "noOgImage": "No og:image - shared links will have no visual",
+            "tags": "Tag checklist",
+            "missing": "missing",
+            "chars": "{{count}} chars",
+            "defaultIndexable": "not set (indexable)",
+            "jsonLdValue": "{{count}} block(s), {{errors}} error(s)",
+            "hreflangValue": "{{count}} alternate language link(s)",
+            "imageAltValue": "{{missing}} of {{total}} images without alt",
+            "fields": {
+                "title": "Title",
+                "description": "Meta description",
+                "canonical": "Canonical URL",
+                "robots": "Robots directives",
+                "ogTitle": "og:title",
+                "ogDescription": "og:description",
+                "ogImage": "og:image",
+                "twitterCard": "twitter:card",
+                "jsonLd": "Structured data (JSON-LD)",
+                "lang": "HTML lang attribute",
+                "hreflang": "hreflang alternates",
+                "imageAlt": "Image alt texts"
+            },
+            "recs": {
+                "noTitle": {
+                    "title": "The page has no title",
+                    "detail": "The <title> is the strongest on-page SEO signal and the text shown in search results. Set one in the page's SEO properties."
+                },
+                "titleLength": {
+                    "title": "Title is {{length}} characters",
+                    "detail": "Aim for {{min}}-{{max}} characters: shorter wastes the space, longer gets truncated in search results."
+                },
+                "noDescription": {
+                    "title": "No meta description",
+                    "detail": "Search engines will pick an arbitrary text snippet. Write a 50-160 character summary that makes people want to click."
+                },
+                "descriptionLength": {
+                    "title": "Meta description is {{length}} characters",
+                    "detail": "Aim for {{min}}-{{max}} characters so the full text shows in search results."
+                },
+                "noindex": {
+                    "title": "Page is excluded from search engines (noindex)",
+                    "detail": "The robots meta tag contains noindex ({{content}}). If this page should be public, remove it - it will never appear in search results."
+                },
+                "nofollow": {
+                    "title": "Links are not followed (nofollow)",
+                    "detail": "The robots meta tag contains nofollow ({{content}}): search engines ignore every link on this page. Verify it is intentional."
+                },
+                "noCanonical": {
+                    "title": "No canonical URL",
+                    "detail": "A canonical link prevents duplicate-content issues when the page is reachable through several URLs (vanity URLs, parameters)."
+                },
+                "incompleteOg": {
+                    "title": "Incomplete Open Graph tags",
+                    "detail": "Without og:title and og:image, links shared on social networks and chat tools render as bare URLs. Fill in the page's social/SEO properties."
+                },
+                "invalidStructuredData": {
+                    "title": "{{count}} invalid JSON-LD blocks",
+                    "detail": "The structured data does not parse, so search engines ignore it. Validate the JSON-LD markup."
+                },
+                "noStructuredData": {
+                    "title": "No structured data",
+                    "detail": "JSON-LD (Article, Organization, BreadcrumbList…) enables rich results in search engines. Worth adding on key pages."
+                },
+                "noLang": {
+                    "title": "Missing lang attribute on <html>",
+                    "detail": "Screen readers and search engines cannot tell what language the page is in. The template should set <html lang>."
+                },
+                "langMismatch": {
+                    "title": "Page declares lang=\"{{htmlLang}}\" but is audited in \"{{expected}}\"",
+                    "detail": "A wrong lang attribute confuses search engines and screen reader pronunciation. Check the template's language handling."
+                },
+                "missingAlt": {
+                    "title": "{{count}} images without alt attribute",
+                    "detail": "Alt text is how search engines and screen readers understand images. Fill the alt field on each image in the content editor."
+                },
+                "genericAnchors": {
+                    "title": "{{count}} generic link texts (\"click here\", \"read more\"…)",
+                    "detail": "Descriptive link text helps SEO and screen reader users. Say where the link goes: \"Read the 2026 annual report\"."
+                }
+            }
+        },
+        "links": {
+            "summary": "Link summary",
+            "total": "Total links",
+            "internal": "Internal",
+            "external": "External",
+            "checked": "{{count}} verified",
+            "skipped": "{{count}} skipped (login/logout/actions)",
+            "truncated": "{{count}} not verified (limit reached)",
+            "externalNote": "external links are not verified (browser cross-origin restriction)",
+            "broken": "Broken links",
+            "editWorkspace": "Links to the edit workspace",
+            "statusError": "error",
+            "recs": {
+                "brokenLinks": {
+                    "title": "{{count}} broken internal links",
+                    "detail": "These links return an error for visitors. Fix or remove them - the list below shows each one with a highlight button."
+                },
+                "editWorkspaceUrls": {
+                    "title": "{{count}} links point to the edit workspace",
+                    "detail": "URLs containing /cms/render/default/ or /cms/edit/ were pasted from the editing UI. Visitors will get a login page or 404. Replace them with internal page links."
+                },
+                "hardcodedUrls": {
+                    "title": "{{count}} absolute URLs hardcoded to this host",
+                    "detail": "Links written with the full http(s)://host break when the site moves environment or domain. Use internal page links instead."
+                },
+                "mixedContent": {
+                    "title": "{{count}} http:// links on an https page",
+                    "detail": "Browsers flag or block mixed content. Switch these URLs to https."
+                },
+                "blankNoopener": {
+                    "title": "{{count}} target=\"_blank\" links without rel=\"noopener\"",
+                    "detail": "Pages opened in a new tab get access to this page's window object. Add rel=\"noopener\" in the template or rich-text content."
+                }
+            }
         },
         "recs": {
             "title": "Recommendations",

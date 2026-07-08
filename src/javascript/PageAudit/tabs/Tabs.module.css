@@ -247,4 +247,59 @@
     color: #6b7a86;
     font-size: 12px;
     margin-top: 2px;
+    word-break: break-word;
+}
+
+.okMark {
+    color: #1b7d3e;
+    font-weight: 700;
+}
+
+.koMark {
+    color: #e0182d;
+    font-weight: 700;
+}
+
+.tagValue {
+    word-break: break-word;
+}
+
+.previewCard {
+    border: 1px solid #e4e4e4;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 440px;
+    background: #fff;
+}
+
+.previewImage {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+    background: #eef1f3;
+}
+
+.previewImageMissing {
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef1f3;
+    color: #6b7a86;
+    font-size: 12px;
+}
+
+.previewBody {
+    padding: 10px 12px;
+}
+
+.previewTitle {
+    font-weight: 600;
+}
+
+.previewDesc {
+    color: #6b7a86;
+    font-size: 12px;
+    margin-top: 2px;
 }

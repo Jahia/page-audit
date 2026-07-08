@@ -15,9 +15,130 @@
         },
         "tabs": {
             "accessibility": "Accessibilité",
+            "seo": "SEO",
+            "links": "Liens",
             "vitals": "Web Vitals",
             "readability": "Lisibilité",
             "badgeTooltip": "{{count}} points à corriger"
+        },
+        "seo": {
+            "preview": "Aperçu de partage social",
+            "noPreview": "Aucun titre ni og:title trouvé : rien à prévisualiser.",
+            "noOgImage": "Pas d'og:image : les liens partagés n'auront pas de visuel",
+            "tags": "Liste des balises",
+            "missing": "absent",
+            "chars": "{{count}} caractères",
+            "defaultIndexable": "non défini (indexable)",
+            "jsonLdValue": "{{count}} bloc(s), {{errors}} erreur(s)",
+            "hreflangValue": "{{count}} lien(s) de langue alternative",
+            "imageAltValue": "{{missing}} images sur {{total}} sans alt",
+            "fields": {
+                "title": "Titre",
+                "description": "Meta description",
+                "canonical": "URL canonique",
+                "robots": "Directives robots",
+                "ogTitle": "og:title",
+                "ogDescription": "og:description",
+                "ogImage": "og:image",
+                "twitterCard": "twitter:card",
+                "jsonLd": "Données structurées (JSON-LD)",
+                "lang": "Attribut lang du HTML",
+                "hreflang": "Alternatives hreflang",
+                "imageAlt": "Textes alt des images"
+            },
+            "recs": {
+                "noTitle": {
+                    "title": "La page n'a pas de titre",
+                    "detail": "La balise <title> est le signal SEO le plus fort et le texte affiché dans les résultats de recherche. Renseignez-la dans les propriétés SEO de la page."
+                },
+                "titleLength": {
+                    "title": "Le titre fait {{length}} caractères",
+                    "detail": "Visez {{min}} à {{max}} caractères : plus court gaspille l'espace, plus long est tronqué dans les résultats de recherche."
+                },
+                "noDescription": {
+                    "title": "Pas de meta description",
+                    "detail": "Les moteurs choisiront un extrait arbitraire. Rédigez un résumé de 50 à 160 caractères qui donne envie de cliquer."
+                },
+                "descriptionLength": {
+                    "title": "La meta description fait {{length}} caractères",
+                    "detail": "Visez {{min}} à {{max}} caractères pour que le texte s'affiche en entier dans les résultats."
+                },
+                "noindex": {
+                    "title": "Page exclue des moteurs de recherche (noindex)",
+                    "detail": "La balise robots contient noindex ({{content}}). Si cette page doit être publique, retirez-la : elle n'apparaîtra jamais dans les résultats."
+                },
+                "nofollow": {
+                    "title": "Liens non suivis (nofollow)",
+                    "detail": "La balise robots contient nofollow ({{content}}) : les moteurs ignorent tous les liens de cette page. Vérifiez que c'est volontaire."
+                },
+                "noCanonical": {
+                    "title": "Pas d'URL canonique",
+                    "detail": "Un lien canonical évite les problèmes de contenu dupliqué quand la page est accessible par plusieurs URL (URL de vanité, paramètres)."
+                },
+                "incompleteOg": {
+                    "title": "Balises Open Graph incomplètes",
+                    "detail": "Sans og:title et og:image, les liens partagés sur les réseaux sociaux et messageries s'affichent comme des URL brutes. Renseignez les propriétés sociales/SEO de la page."
+                },
+                "invalidStructuredData": {
+                    "title": "{{count}} blocs JSON-LD invalides",
+                    "detail": "Les données structurées ne se parsent pas : les moteurs les ignorent. Validez le balisage JSON-LD."
+                },
+                "noStructuredData": {
+                    "title": "Pas de données structurées",
+                    "detail": "Le JSON-LD (Article, Organization, BreadcrumbList…) permet les résultats enrichis dans les moteurs. Utile sur les pages clés."
+                },
+                "noLang": {
+                    "title": "Attribut lang absent sur <html>",
+                    "detail": "Les lecteurs d'écran et les moteurs ne peuvent pas déterminer la langue de la page. Le template doit définir <html lang>."
+                },
+                "langMismatch": {
+                    "title": "La page déclare lang=\"{{htmlLang}}\" mais est auditée en \"{{expected}}\"",
+                    "detail": "Un attribut lang erroné perturbe les moteurs et la prononciation des lecteurs d'écran. Vérifiez la gestion de langue du template."
+                },
+                "missingAlt": {
+                    "title": "{{count}} images sans attribut alt",
+                    "detail": "Le texte alt est ce que comprennent les moteurs et les lecteurs d'écran. Renseignez le champ alt de chaque image dans l'éditeur."
+                },
+                "genericAnchors": {
+                    "title": "{{count}} libellés de lien génériques (« cliquez ici », « en savoir plus »…)",
+                    "detail": "Un libellé descriptif aide le SEO et les utilisateurs de lecteurs d'écran. Dites où mène le lien : « Lire le rapport annuel 2026 »."
+                }
+            }
+        },
+        "links": {
+            "summary": "Synthèse des liens",
+            "total": "Liens au total",
+            "internal": "Internes",
+            "external": "Externes",
+            "checked": "{{count}} vérifiés",
+            "skipped": "{{count}} ignorés (login/logout/actions)",
+            "truncated": "{{count}} non vérifiés (limite atteinte)",
+            "externalNote": "les liens externes ne sont pas vérifiés (restriction cross-origin du navigateur)",
+            "broken": "Liens cassés",
+            "editWorkspace": "Liens vers l'espace d'édition",
+            "statusError": "erreur",
+            "recs": {
+                "brokenLinks": {
+                    "title": "{{count}} liens internes cassés",
+                    "detail": "Ces liens renvoient une erreur aux visiteurs. Corrigez-les ou supprimez-les : la liste ci-dessous les localise avec un bouton de surlignage."
+                },
+                "editWorkspaceUrls": {
+                    "title": "{{count}} liens pointent vers l'espace d'édition",
+                    "detail": "Des URL contenant /cms/render/default/ ou /cms/edit/ ont été collées depuis l'interface d'édition. Les visiteurs obtiendront une page de connexion ou une 404. Remplacez-les par des liens de page internes."
+                },
+                "hardcodedUrls": {
+                    "title": "{{count}} URL absolues codées en dur vers ce serveur",
+                    "detail": "Les liens écrits avec le http(s)://hôte complet cassent au changement d'environnement ou de domaine. Utilisez des liens de page internes."
+                },
+                "mixedContent": {
+                    "title": "{{count}} liens http:// sur une page https",
+                    "detail": "Les navigateurs signalent ou bloquent le contenu mixte. Passez ces URL en https."
+                },
+                "blankNoopener": {
+                    "title": "{{count}} liens target=\"_blank\" sans rel=\"noopener\"",
+                    "detail": "Les pages ouvertes dans un nouvel onglet accèdent à l'objet window de cette page. Ajoutez rel=\"noopener\" dans le template ou le contenu riche."
+                }
+            }
         },
         "recs": {
             "title": "Recommandations",
