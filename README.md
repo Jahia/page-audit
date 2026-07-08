@@ -6,13 +6,13 @@ Jahia jContent UI extension (OSGi/Maven, React 18, Webpack + Module Federation) 
 |---|---|
 | **Accessibility** | axe-core against the full WCAG A / AA / AAA + best-practice rule set. Per-level scorecards, violations grouped by severity with element highlighting, engine version and rules-run transparency, the "needs human review" cases axe cannot decide, and a manual checklist for the WCAG criteria no tool can automate. |
 | **SEO** | Title and meta-description length bands, `noindex`/`nofollow` detection, canonical URL, Open Graph / Twitter card completeness with a rendered **social sharing preview card**, JSON-LD presence and validity, `<html lang>` vs audited language, image alt coverage, generic anchor texts. |
-| **Links** | Verifies every internal link with the editor's session (HEAD, batched) and lists broken ones with highlight-in-preview. Flags hardcoded absolute URLs to the current host, mixed content, and `target="_blank"` without `rel="noopener"`. Never fetches login/logout/`.do` URLs (side effects); external links are counted but honestly marked unverifiable from the browser. |
-| **Jahia** | The checks no generic web tool can do, via jcontent's shared Apollo GraphQL client: unpublished content blocks on the page (visitors see an older version), content missing translations in active site languages, raw i18n keys visible in the DOM (`namespace:key.path`), and placeholder text (lorem ipsum / TODO). |
-| **AI review** (optional) | Sends the page text plus a digest of all audit findings to a configured LLM (Anthropic, OpenAI or DeepSeek) and returns an overall assessment plus prioritized, editor-friendly recommendations with exact-wording quotes highlightable in the preview. Disabled until an administrator configures a provider - see below. |
 | **Web Vitals** | Lab measurement via buffered `PerformanceObserver` and navigation timing: TTFB, DOM ready, full load, CLS, LCP (estimated - Chrome emits no LCP/paint entries in iframes; INP requires interaction), plus diagnostics: page weight, request count, DOM size, image issues, largest resources. |
 | **Readability** | Language-aware scoring: Flesch Reading Ease + Flesch-Kincaid grade (EN), Kandel-Moles adaptation (FR). Sentence/paragraph stats, heading structure checks. |
+| **Links** | Verifies every internal link with the editor's session (HEAD, batched) and lists broken ones with highlight-in-preview. Flags hardcoded absolute URLs to the current host, mixed content, and `target="_blank"` without `rel="noopener"`. Never fetches login/logout/`.do` URLs (side effects); external links are counted but honestly marked unverifiable from the browser. |
+| **Jahia** | The checks no generic web tool can do, via jcontent's shared Apollo GraphQL client: unpublished content blocks on the page (visitors see an older version), content missing translations in active site languages, raw i18n keys visible in the DOM (`namespace:key.path`), and placeholder text (lorem ipsum / TODO). |
+| **AI review** (optional) | Sends the page text plus a digest of all audit findings to a configured LLM (Anthropic, OpenAI or DeepSeek) and returns an overall assessment plus up to 15 prioritized, editor-friendly recommendations across 11 categories - including dimensions no automated check covers: proofreading, factuality, consistency, conversion, localization quality and legal risk. Exact-wording quotes are highlightable in the preview; the footer reports token consumption (in/out) and estimated cost; truncated model answers are salvaged rather than failed. Disabled until an administrator configures a provider - see below. |
 
-Results can be re-run and exported as JSON. All UI ships in English and French.
+**Editor comfort**: results (including the AI review) are cached per page and language in the browser's localStorage - reopening the drawer restores the last audit instantly, with a "Last audit: date" indicator in the header. A cheap repository probe detects when the page was modified after the audit and shows a non-blocking notice ("re-run when you are done editing") while keeping the old report visible as a fix-it checklist. The page preview is collapsible to give the results the full drawer height. Results can be re-run and exported as JSON. All UI ships in English and French.
 
 ## Build and deploy
 
@@ -31,11 +31,13 @@ The module must be **enabled on the target site** (Administration > Modules) for
 The AI tab stays disabled until configured. Edit `digital-factory-data/karaf/etc/org.jahia.se.modules.pageaudit.cfg` at runtime (picked up immediately, no restart):
 
 ```properties
-AI_PROVIDER=anthropic        # anthropic | openai | deepseek
+AI_PROVIDER=anthropic             # anthropic | openai | deepseek
 AI_MODEL=claude-sonnet-5
-AI_API_KEY=sk-ant-...        # never commit; never sent to the browser
-AI_MAX_TOKENS=2048
-AI_PROMPT_APPENDIX=          # optional brand/editorial instructions
+AI_API_KEY=sk-ant-...             # never commit; never sent to the browser
+AI_MAX_TOKENS=4096                # a full review needs 3000-4000 output tokens
+AI_PROMPT_APPENDIX=               # optional brand/editorial instructions
+AI_COST_INPUT_PER_MTOKENS=3.00    # USD per 1M tokens - update when changing model
+AI_COST_OUTPUT_PER_MTOKENS=15.00  # used for the estimated cost shown to editors
 ```
 
 The prompt is built **server-side** from a constrained payload (page text + audit digest), so the endpoint cannot be reused as a general-purpose LLM proxy; the servlet also rejects unauthenticated calls. The model must answer with a strict JSON schema (severity, category, title, detail, exact wording) that is validated and whitelisted server-side before reaching the browser - inspired by [ai-content-sentinel](https://github.com/Jahia/ai-content-sentinel) and the [jahia-mcp-chat](https://github.com/smonier/jahia-mcp-chat) proxy pattern.
