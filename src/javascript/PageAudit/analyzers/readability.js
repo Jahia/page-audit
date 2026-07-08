@@ -69,7 +69,7 @@ export function runReadability(frame, language) {
         .filter(w => w.length > 0);
 
     if (words.length < 30) {
-        return {lang, empty: true, words: words.length};
+        return {lang, empty: true, words: words.length, recommendations: []};
     }
 
     const syllables = words.reduce((sum, w) => sum + countSyllables(w, lang), 0);
@@ -102,7 +102,7 @@ export function runReadability(frame, language) {
         (sum, p) => sum + (p.textContent || '').trim().split(/\s+/).length, 0
     );
 
-    return {
+    const result = {
         lang,
         empty: false,
         formula: lang === 'fr' ? 'Kandel-Moles' : 'Flesch',
@@ -120,4 +120,45 @@ export function runReadability(frame, language) {
         paragraphs: paragraphs.length,
         avgWordsPerParagraph: paragraphs.length > 0 ? Math.round(paragraphWords / paragraphs.length) : 0
     };
+
+    result.recommendations = buildReadabilityRecommendations(result);
+    return result;
+}
+
+/**
+ * Actionable advice derived from the scores. Keys resolve to
+ * readability.recs.<key>.title / .detail in the locale bundles.
+ */
+function buildReadabilityRecommendations(r) {
+    const recs = [];
+    const push = (key, severity, params) => recs.push({key, severity, params: params || {}});
+
+    if (r.score < 30) {
+        push('veryHardText', 'serious', {score: r.score});
+    } else if (r.score < 50) {
+        push('hardText', 'moderate', {score: r.score});
+    }
+
+    if (r.longSentences > 0) {
+        push('longSentences', r.longSentences / r.sentences > 0.2 ? 'moderate' : 'minor',
+            {count: r.longSentences});
+    }
+
+    if (r.avgWordsPerParagraph > 80) {
+        push('longParagraphs', 'moderate', {count: r.avgWordsPerParagraph});
+    }
+
+    if (r.h1Count !== 1) {
+        push('h1Count', 'serious', {count: r.h1Count});
+    }
+
+    if (r.headingSkips > 0) {
+        push('headingSkips', 'moderate', {count: r.headingSkips});
+    }
+
+    if (r.words < 300) {
+        push('thinContent', 'minor', {count: r.words});
+    }
+
+    return recs;
 }

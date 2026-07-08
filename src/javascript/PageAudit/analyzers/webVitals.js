@@ -130,7 +130,7 @@ export async function runWebVitals(frame) {
         img.naturalWidth > 0 && img.clientWidth > 0 && img.naturalWidth > img.clientWidth * 2
     ).length;
 
-    return {
+    const result = {
         metrics: {
             ttfb: nav ? nav.responseStart : null,
             dcl: nav && nav.domContentLoadedEventEnd ? nav.domContentLoadedEventEnd : null,
@@ -151,6 +151,64 @@ export async function runWebVitals(frame) {
             oversized
         }
     };
+
+    result.recommendations = buildVitalsRecommendations(result);
+    return result;
+}
+
+/**
+ * Turns raw measurements into actionable recommendations. Each item carries
+ * an i18n key (vitals.recs.<key>.title / .detail), a severity aligned with
+ * the accessibility impact scale, and interpolation params.
+ */
+function buildVitalsRecommendations({metrics, diagnostics}) {
+    const recs = [];
+    const push = (key, severity, params) => recs.push({key, severity, params: params || {}});
+
+    const lcpBand = bandOf('lcp', metrics.lcp);
+    if (lcpBand && lcpBand !== 'good') {
+        push('slowLcp', lcpBand === 'poor' ? 'serious' : 'moderate');
+    }
+
+    const clsBand = bandOf('cls', metrics.cls);
+    if (clsBand && clsBand !== 'good') {
+        push('highCls', clsBand === 'poor' ? 'serious' : 'moderate');
+    }
+
+    const ttfbBand = bandOf('ttfb', metrics.ttfb);
+    if (ttfbBand && ttfbBand !== 'good') {
+        push('slowTtfb', ttfbBand === 'poor' ? 'serious' : 'moderate');
+    }
+
+    if (diagnostics.missingDims > 0) {
+        push('missingDims', 'serious', {count: diagnostics.missingDims});
+    }
+
+    if (diagnostics.oversized > 0) {
+        push('oversizedImages', 'moderate', {count: diagnostics.oversized});
+    }
+
+    if (diagnostics.totalBytes > 2 * 1024 * 1024) {
+        push('heavyPage', 'serious', {size: `${(diagnostics.totalBytes / (1024 * 1024)).toFixed(1)} MB`});
+    } else if (diagnostics.totalBytes > 1024 * 1024) {
+        push('heavyPage', 'moderate', {size: `${(diagnostics.totalBytes / (1024 * 1024)).toFixed(1)} MB`});
+    }
+
+    if (diagnostics.requests > 80) {
+        push('manyRequests', 'moderate', {count: diagnostics.requests});
+    }
+
+    if (diagnostics.domNodes > 1500) {
+        push('largeDom', 'moderate', {count: diagnostics.domNodes});
+    }
+
+    const heavyAssets = diagnostics.largest.filter(r =>
+        r.bytes > 300 * 1024 && ['script', 'link', 'css'].includes(r.type));
+    if (heavyAssets.length > 0) {
+        push('heavyAssets', 'moderate', {count: heavyAssets.length, name: heavyAssets[0].name});
+    }
+
+    return recs;
 }
 
 /** Google thresholds: [good upper bound, needs-improvement upper bound] */

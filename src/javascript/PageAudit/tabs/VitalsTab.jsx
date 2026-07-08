@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {useTranslation} from 'react-i18next';
 import {bandOf} from '../analyzers/webVitals';
+import {Recommendations} from './Recommendations';
 import styles from './Tabs.module.css';
 
 function formatMs(value) {
@@ -57,6 +58,8 @@ export function VitalsTab({result}) {
                     );
                 })}
             </div>
+
+            <Recommendations items={result.recommendations} ns="vitals"/>
 
             <h4 className={styles.sectionTitle}>{t('vitals.diagnostics')}</h4>
             <ul className={styles.statList}>

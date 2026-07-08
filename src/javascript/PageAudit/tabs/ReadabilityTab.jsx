@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {useTranslation} from 'react-i18next';
+import {Recommendations} from './Recommendations';
 import styles from './Tabs.module.css';
 
 export function ReadabilityTab({result}) {
@@ -38,15 +39,14 @@ export function ReadabilityTab({result}) {
                 </div>
             </div>
 
+            <Recommendations items={result.recommendations} ns="readability"/>
+
             <h4 className={styles.sectionTitle}>{t('readability.textStats')}</h4>
             <ul className={styles.statList}>
                 <li>{t('readability.words')}: <strong>{result.words}</strong></li>
                 <li>{t('readability.sentences')}: <strong>{result.sentences}</strong></li>
                 <li>{t('readability.avgSentenceLength')}: <strong>{result.avgSentenceLength}</strong></li>
-                <li>
-                    {t('readability.longSentences')}: <strong>{result.longSentences}</strong>
-                    {result.longSentences > 0 && <span className={styles.warn}> · {t('readability.longSentencesHint')}</span>}
-                </li>
+                <li>{t('readability.longSentences')}: <strong>{result.longSentences}</strong></li>
                 <li>{t('readability.paragraphs')}: <strong>{result.paragraphs}</strong>
                     {' '}({t('readability.avgWordsPerParagraph')}: {result.avgWordsPerParagraph})
                 </li>
@@ -54,14 +54,8 @@ export function ReadabilityTab({result}) {
 
             <h4 className={styles.sectionTitle}>{t('readability.structure')}</h4>
             <ul className={styles.statList}>
-                <li>
-                    {t('readability.h1Count')}: <strong>{result.h1Count}</strong>
-                    {result.h1Count !== 1 && <span className={styles.warn}> · {t('readability.h1Hint')}</span>}
-                </li>
-                <li>
-                    {t('readability.headingSkips')}: <strong>{result.headingSkips}</strong>
-                    {result.headingSkips > 0 && <span className={styles.warn}> · {t('readability.headingSkipsHint')}</span>}
-                </li>
+                <li>{t('readability.h1Count')}: <strong>{result.h1Count}</strong></li>
+                <li>{t('readability.headingSkips')}: <strong>{result.headingSkips}</strong></li>
             </ul>
         </div>
     );

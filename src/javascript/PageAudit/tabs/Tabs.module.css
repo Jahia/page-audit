@@ -215,3 +215,36 @@
 .warn {
     color: #b0620d;
 }
+
+.recList {
+    margin-bottom: 18px;
+}
+
+.rec {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid #e4e4e4;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #fff;
+}
+
+.rec .impact {
+    margin-top: 2px;
+}
+
+.recBody {
+    min-width: 0;
+}
+
+.recTitle {
+    font-weight: 600;
+}
+
+.recDetail {
+    color: #6b7a86;
+    font-size: 12px;
+    margin-top: 2px;
+}

@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useTranslation} from 'react-i18next';
 import {runAccessibility} from './analyzers/accessibility';
-import {runWebVitals, bandOf} from './analyzers/webVitals';
+import {runWebVitals} from './analyzers/webVitals';
 import {runReadability} from './analyzers/readability';
 import {AccessibilityTab} from './tabs/AccessibilityTab';
 import {VitalsTab} from './tabs/VitalsTab';
@@ -109,16 +109,11 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
         URL.revokeObjectURL(a.href);
     }, [results, path, language, previewUrl]);
 
-    const a11yCount = results ? results.a11y.violations.length : null;
-    const poorVitals = results ?
-        Object.entries(results.vitals.metrics).filter(([k, v]) => bandOf(k, v) === 'poor').length :
-        null;
-    const readabilityScore = results && !results.readability.empty ? results.readability.score : null;
-
+    // Badges all mean the same thing: number of issues to review in that tab.
     const tabs = [
-        {key: 'accessibility', label: t('tabs.accessibility'), badge: a11yCount},
-        {key: 'vitals', label: t('tabs.vitals'), badge: poorVitals},
-        {key: 'readability', label: t('tabs.readability'), badge: readabilityScore}
+        {key: 'accessibility', label: t('tabs.accessibility'), badge: results ? results.a11y.violations.length : null},
+        {key: 'vitals', label: t('tabs.vitals'), badge: results ? results.vitals.recommendations.length : null},
+        {key: 'readability', label: t('tabs.readability'), badge: results ? results.readability.recommendations.length : null}
     ];
 
     return (
@@ -184,6 +179,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                             key={tab.key}
                             type="button"
                             className={`${styles.tab} ${activeTab === tab.key ? styles.tabActive : ''}`}
+                            title={tab.badge === null ? undefined : t('tabs.badgeTooltip', {count: tab.badge})}
                             onClick={() => setActiveTab(tab.key)}
                         >
                             {tab.label}

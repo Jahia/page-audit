@@ -16,7 +16,12 @@
         "tabs": {
             "accessibility": "Accessibilité",
             "vitals": "Web Vitals",
-            "readability": "Lisibilité"
+            "readability": "Lisibilité",
+            "badgeTooltip": "{{count}} points à corriger"
+        },
+        "recs": {
+            "title": "Recommandations",
+            "none": "Rien à améliorer dans cette catégorie."
         },
         "a11y": {
             "levels": {
@@ -62,7 +67,45 @@
             "images": "Images",
             "missingDims": "{{count}} sans width/height",
             "oversized": "{{count}} surdimensionnées",
-            "largest": "Ressources les plus lourdes"
+            "largest": "Ressources les plus lourdes",
+            "recs": {
+                "slowLcp": {
+                    "title": "Le contenu principal s'affiche lentement",
+                    "detail": "Compressez ou préchargez l'image principale / le plus gros bloc pour que les visiteurs voient le contenu essentiel plus tôt."
+                },
+                "highCls": {
+                    "title": "La mise en page bouge pendant le chargement",
+                    "detail": "Réservez l'espace des images, embeds et blocs chargés tardivement pour que la page ne saute pas sous les yeux du lecteur."
+                },
+                "slowTtfb": {
+                    "title": "Réponse serveur lente (TTFB)",
+                    "detail": "Le HTML lui-même arrive lentement : activez le cache de page ou vérifiez la charge serveur avant toute autre optimisation."
+                },
+                "missingDims": {
+                    "title": "{{count}} images sans attributs width/height",
+                    "detail": "Ajoutez width et height pour que le navigateur réserve l'espace : c'est la première cause de sauts de mise en page."
+                },
+                "oversizedImages": {
+                    "title": "{{count}} images plus lourdes que nécessaire",
+                    "detail": "Le fichier source fait plus du double de sa taille affichée. Chargez des variantes redimensionnées ou laissez Jahia servir des rendus plus petits."
+                },
+                "heavyPage": {
+                    "title": "Page lourde ({{size}})",
+                    "detail": "Compressez les images et supprimez les scripts/styles inutilisés pour réduire le poids total, surtout pour les visiteurs mobiles."
+                },
+                "manyRequests": {
+                    "title": "{{count}} requêtes réseau",
+                    "detail": "Regroupez ou supprimez des ressources et chargez le bas de page à la demande : chaque requête ajoute de la latence."
+                },
+                "largeDom": {
+                    "title": "DOM volumineux ({{count}} nœuds)",
+                    "detail": "Simplifiez le balisage ou découpez les pages très longues : un DOM volumineux ralentit le rendu et chaque interaction."
+                },
+                "heavyAssets": {
+                    "title": "{{count}} fichiers très lourds (ex. {{name}})",
+                    "detail": "Minifiez, compressez ou découpez ces ressources, ou chargez-les uniquement là où elles servent."
+                }
+            }
         },
         "readability": {
             "score": "Score de lisibilité",
@@ -89,7 +132,37 @@
             "h1Hint": "une page doit avoir exactement un H1",
             "headingSkips": "Niveaux de titre sautés",
             "headingSkipsHint": "évitez de sauter des niveaux (ex. H2 vers H4)",
-            "noText": "Texte insuffisant sur cette page pour calculer la lisibilité ({{count}} mots trouvés)."
+            "noText": "Texte insuffisant sur cette page pour calculer la lisibilité ({{count}} mots trouvés).",
+            "recs": {
+                "veryHardText": {
+                    "title": "Texte très difficile à lire (score {{score}})",
+                    "detail": "Raccourcissez les phrases et privilégiez les mots courants. Visez un score supérieur à 50 pour un public généraliste."
+                },
+                "hardText": {
+                    "title": "Texte difficile à lire (score {{score}})",
+                    "detail": "Raccourcissez les phrases les plus longues et remplacez le jargon : un score de 50 à 70 convient à la plupart des visiteurs."
+                },
+                "longSentences": {
+                    "title": "{{count}} phrases de plus de 25 mots",
+                    "detail": "Découpez-les : une idée par phrase. Les phrases longues sont la première cause d'un mauvais score de lisibilité."
+                },
+                "longParagraphs": {
+                    "title": "Paragraphes denses ({{count}} mots en moyenne)",
+                    "detail": "Aérez le texte : 40 à 60 mots par paragraphe restent confortables à l'écran."
+                },
+                "h1Count": {
+                    "title": "{{count}} titres H1 sur la page",
+                    "detail": "Utilisez exactement un H1 : il structure la page pour les lecteurs, les lecteurs d'écran et les moteurs de recherche."
+                },
+                "headingSkips": {
+                    "title": "{{count}} niveaux de titre sautés",
+                    "detail": "Ne sautez pas de niveaux (ex. H2 directement vers H4) : corrigez la hiérarchie pour garder un plan de document cohérent."
+                },
+                "thinContent": {
+                    "title": "Peu de texte sur la page ({{count}} mots)",
+                    "detail": "Une page de moins de 300 mots informe mal et se référence mal. Étoffez le contenu ou fusionnez-le ailleurs."
+                }
+            }
         }
     }
 }

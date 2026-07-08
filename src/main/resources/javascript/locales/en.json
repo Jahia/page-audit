@@ -16,7 +16,12 @@
         "tabs": {
             "accessibility": "Accessibility",
             "vitals": "Web Vitals",
-            "readability": "Readability"
+            "readability": "Readability",
+            "badgeTooltip": "{{count}} issues to review"
+        },
+        "recs": {
+            "title": "Recommendations",
+            "none": "Nothing to improve in this category."
         },
         "a11y": {
             "levels": {
@@ -62,7 +67,45 @@
             "images": "Images",
             "missingDims": "{{count}} without width/height",
             "oversized": "{{count}} oversized",
-            "largest": "Largest resources"
+            "largest": "Largest resources",
+            "recs": {
+                "slowLcp": {
+                    "title": "Main content renders slowly",
+                    "detail": "Compress or preload the hero image / largest block so visitors see the main content sooner."
+                },
+                "highCls": {
+                    "title": "Layout shifts while loading",
+                    "detail": "Reserve space for images, embeds and late-loading blocks so the page does not jump under the reader."
+                },
+                "slowTtfb": {
+                    "title": "Slow server response (TTFB)",
+                    "detail": "The HTML itself is slow to arrive: enable page caching or review server load before optimizing anything else."
+                },
+                "missingDims": {
+                    "title": "{{count}} images without width/height attributes",
+                    "detail": "Add width and height so the browser reserves the space up front - this is the most common cause of layout shifts."
+                },
+                "oversizedImages": {
+                    "title": "{{count}} images heavier than needed",
+                    "detail": "The source file is more than twice its displayed size. Upload resized variants or let Jahia serve smaller renditions."
+                },
+                "heavyPage": {
+                    "title": "Heavy page ({{size}})",
+                    "detail": "Compress images and remove unused scripts/styles to reduce total download weight, especially for mobile visitors."
+                },
+                "manyRequests": {
+                    "title": "{{count}} network requests",
+                    "detail": "Combine or drop resources and lazy-load below-the-fold content: each request adds latency."
+                },
+                "largeDom": {
+                    "title": "Large DOM ({{count}} nodes)",
+                    "detail": "Simplify the markup or split very long pages: a large DOM slows rendering and every interaction."
+                },
+                "heavyAssets": {
+                    "title": "{{count}} very large files (e.g. {{name}})",
+                    "detail": "Minify, compress or split these assets, or load them only where actually used."
+                }
+            }
         },
         "readability": {
             "score": "Readability score",
@@ -89,7 +132,37 @@
             "h1Hint": "a page should have exactly one H1",
             "headingSkips": "Skipped heading levels",
             "headingSkipsHint": "avoid jumping levels (e.g. H2 to H4)",
-            "noText": "Not enough text on this page to compute readability ({{count}} words found)."
+            "noText": "Not enough text on this page to compute readability ({{count}} words found).",
+            "recs": {
+                "veryHardText": {
+                    "title": "Text is very difficult to read (score {{score}})",
+                    "detail": "Shorten sentences and prefer everyday words. Aim for a score above 50 for a general audience."
+                },
+                "hardText": {
+                    "title": "Text is difficult to read (score {{score}})",
+                    "detail": "Shorten the longest sentences and replace jargon: a score of 50-70 suits most website visitors."
+                },
+                "longSentences": {
+                    "title": "{{count}} sentences longer than 25 words",
+                    "detail": "Split them - one idea per sentence. Long sentences are the main driver of a poor readability score."
+                },
+                "longParagraphs": {
+                    "title": "Dense paragraphs ({{count}} words on average)",
+                    "detail": "Break paragraphs up: 40-60 words per paragraph reads comfortably on screen."
+                },
+                "h1Count": {
+                    "title": "{{count}} H1 headings on the page",
+                    "detail": "Use exactly one H1: it anchors the page for readers, screen readers and search engines."
+                },
+                "headingSkips": {
+                    "title": "{{count}} skipped heading levels",
+                    "detail": "Do not jump levels (e.g. H2 straight to H4): fix the hierarchy so the document outline stays meaningful."
+                },
+                "thinContent": {
+                    "title": "Little text on the page ({{count}} words)",
+                    "detail": "Pages under ~300 words inform and rank poorly. Consider expanding the content or merging it elsewhere."
+                }
+            }
         }
     }
 }
