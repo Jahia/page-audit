@@ -8,6 +8,7 @@ import {runReadability} from './analyzers/readability';
 import {runSeo} from './analyzers/seo';
 import {runLinks} from './analyzers/links';
 import {runJahiaHealth} from './analyzers/jahiaHealth';
+import {removeToolingElements} from './analyzers/tooling';
 import {AccessibilityTab} from './tabs/AccessibilityTab';
 import {VitalsTab} from './tabs/VitalsTab';
 import {ReadabilityTab} from './tabs/ReadabilityTab';
@@ -57,6 +58,17 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                 if (!frame || !frame.contentDocument) {
                     throw new Error('Preview frame unavailable');
                 }
+
+                // Refuse to audit an error page (404/500 render) - scoring it
+                // would silently produce meaningless results.
+                const navEntry = frame.contentWindow.performance.getEntriesByType('navigation')[0];
+                if (navEntry && navEntry.responseStatus >= 400) {
+                    throw new Error(`HTTP ${navEntry.responseStatus}`);
+                }
+
+                // Strip editor/preview tooling (jExperience persona panel…)
+                // before any analyzer sees the DOM.
+                removeToolingElements(frame.contentDocument);
 
                 // Vitals first: axe injection and link checks would otherwise
                 // appear in the page's own resource statistics.
