@@ -15,6 +15,19 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
+      # css-loader >= 7 switches CSS modules to named exports: the bundle
+      # compiles but every `styles.x` is undefined at runtime (drawer
+      # invisible). Requires a webpack config migration before bumping.
+      - dependency-name: "css-loader"
+        update-types: ["version-update:semver-major"]
+      # These majors require Node 20+; the Maven build pins Node 18.
+      # Re-allow after bumping nodeVersion in pom.xml.
+      - dependency-name: "babel-loader"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "copy-webpack-plugin"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "rimraf"
+        update-types: ["version-update:semver-major"]
 
   # Maven: the Jahia parent POM and provided Jahia artifacts are pinned to the
   # platform version and must never be bumped by a bot.
