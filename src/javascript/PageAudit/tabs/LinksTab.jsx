@@ -50,29 +50,6 @@ export function LinksTab({result, onHighlight}) {
                 </>
             )}
 
-            {result.editWorkspace.length > 0 && (
-                <>
-                    <h4 className={styles.sectionTitle}>{t('links.editWorkspace')}</h4>
-                    {result.editWorkspace.map(link => (
-                        <div key={link.href} className={styles.rec}>
-                            <span className={`${styles.impact} ${styles.impact_serious}`}>
-                                {t('a11y.impacts.serious')}
-                            </span>
-                            <div className={styles.recBody}>
-                                <div className={styles.recTitle}>{link.text || link.href}</div>
-                                <div className={styles.recDetail}>{link.href}</div>
-                                <button
-                                    type="button"
-                                    className={styles.smallButton}
-                                    onClick={() => onHighlight(selectorFor(link.href))}
-                                >
-                                    {t('a11y.highlight')}
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </>
-            )}
         </div>
     );
 }

@@ -74,7 +74,8 @@ module.exports = (env, argv) => {
                     react: {singleton: true, requiredVersion: packageJson.dependencies.react},
                     'react-dom': {singleton: true, requiredVersion: packageJson.dependencies['react-dom']},
                     'react-redux': {singleton: true, import: false},
-                    redux: {singleton: true, import: false}
+                    redux: {singleton: true, import: false},
+                    '@apollo/client': {singleton: true, import: false}
                 }
             })),
             new CleanWebpackPlugin({verbose: false}),

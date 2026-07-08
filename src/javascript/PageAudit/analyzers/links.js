@@ -1,15 +1,15 @@
 /**
  * Link health check. Internal links are verified with same-origin HEAD
  * requests using the editor's session; external links cannot be fetched
- * from the browser (CORS) and are only counted. Also detects links that
- * leak the editing environment: edit-workspace URLs and hardcoded
- * absolute URLs to the current host.
+ * from the browser (CORS) and are only counted. Also detects hardcoded
+ * absolute URLs to the current host (they break on environment changes).
+ * Note: the audited render IS the default workspace, so /cms/render/default/
+ * URLs are the normal shape of internal links here - not a defect.
  */
 
 const MAX_CHECKED = 60;
 const BATCH_SIZE = 6;
 
-const EDIT_WORKSPACE = /\/cms\/(render\/default|edit(frame)?)\//;
 const SKIP_SCHEMES = /^(#|mailto:|tel:|javascript:)/i;
 
 // Never fetch these: requesting a logout link kills the editor's session,
@@ -62,7 +62,6 @@ export async function runLinks(frame) {
     const internal = all.filter(l => l.abs.startsWith(origin));
     const external = all.filter(l => !l.abs.startsWith(origin));
 
-    const editWorkspace = internal.filter(l => EDIT_WORKSPACE.test(l.abs));
     // Absolute URL hardcoded to the current host: breaks on any other environment
     const hardcodedHost = internal.filter(l => /^https?:\/\//i.test(l.href));
     const blankNoopener = all.filter(l => l.targetBlank && !l.rel.includes('noopener')).length;
@@ -108,7 +107,6 @@ export async function runLinks(frame) {
         skippedSideEffect,
         truncated: byUrl.size > MAX_CHECKED ? byUrl.size - MAX_CHECKED : 0,
         broken,
-        editWorkspace: editWorkspace.map(l => ({href: l.href, text: l.text})),
         hardcodedHost: hardcodedHost.length,
         blankNoopener,
         mixedContent
@@ -124,10 +122,6 @@ function buildLinksRecommendations(r) {
 
     if (r.broken.length > 0) {
         push('brokenLinks', 'critical', {count: r.broken.length});
-    }
-
-    if (r.editWorkspace.length > 0) {
-        push('editWorkspaceUrls', 'serious', {count: r.editWorkspace.length});
     }
 
     if (r.hardcodedHost > 0) {

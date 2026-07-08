@@ -1,16 +1,19 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
 import {useTranslation} from 'react-i18next';
+import {useApolloClient} from '@apollo/client';
 import {runAccessibility} from './analyzers/accessibility';
 import {runWebVitals} from './analyzers/webVitals';
 import {runReadability} from './analyzers/readability';
 import {runSeo} from './analyzers/seo';
 import {runLinks} from './analyzers/links';
+import {runJahiaHealth} from './analyzers/jahiaHealth';
 import {AccessibilityTab} from './tabs/AccessibilityTab';
 import {VitalsTab} from './tabs/VitalsTab';
 import {ReadabilityTab} from './tabs/ReadabilityTab';
 import {SeoTab} from './tabs/SeoTab';
 import {LinksTab} from './tabs/LinksTab';
+import {JahiaTab} from './tabs/JahiaTab';
 import styles from './PageAuditDrawer.module.css';
 
 // Let client islands hydrate and layout settle before measuring
@@ -18,6 +21,7 @@ const SETTLE_MS = 2500;
 
 export function PageAuditDrawer({isOpen, onClose, path, language}) {
     const {t} = useTranslation('page-audit');
+    const apolloClient = useApolloClient();
     const [activeTab, setActiveTab] = useState('accessibility');
     const [status, setStatus] = useState('idle');
     const [results, setResults] = useState(null);
@@ -61,7 +65,8 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                 const seo = runSeo(frame, language);
                 const a11y = await runAccessibility(frame);
                 const links = await runLinks(frame);
-                setResults({a11y, vitals, readability, seo, links});
+                const jahia = await runJahiaHealth(frame, {client: apolloClient, path, language});
+                setResults({a11y, vitals, readability, seo, links, jahia});
                 setStatus('ready');
             } catch (e) {
                 console.error('[page-audit] analysis failed', e);
@@ -69,7 +74,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                 setStatus('error');
             }
         }, SETTLE_MS);
-    }, [language]);
+    }, [language, path, apolloClient]);
 
     const highlight = useCallback(selector => {
         const doc = frameRef.current && frameRef.current.contentDocument;
@@ -101,6 +106,37 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
         }
     }, []);
 
+    const highlightText = useCallback(sample => {
+        const doc = frameRef.current && frameRef.current.contentDocument;
+        if (!doc || !doc.body || !sample) {
+            return;
+        }
+
+        if (highlightedRef.current) {
+            try {
+                highlightedRef.current.style.outline = '';
+                highlightedRef.current.style.outlineOffset = '';
+            } catch (e) {
+                // Element may be gone after re-run
+            }
+        }
+
+        const walker = doc.createTreeWalker(doc.body, 4 /* NodeFilter.SHOW_TEXT */);
+        let node = walker.nextNode();
+        while (node) {
+            if ((node.textContent || '').includes(sample) && node.parentElement) {
+                const el = node.parentElement;
+                el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                el.style.outline = '3px solid #e0182d';
+                el.style.outlineOffset = '2px';
+                highlightedRef.current = el;
+                return;
+            }
+
+            node = walker.nextNode();
+        }
+    }, []);
+
     const exportJson = useCallback(() => {
         if (!results) {
             return;
@@ -120,6 +156,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
         {key: 'accessibility', label: t('tabs.accessibility'), badge: results ? results.a11y.violations.length : null},
         {key: 'seo', label: t('tabs.seo'), badge: results ? results.seo.recommendations.length : null},
         {key: 'links', label: t('tabs.links'), badge: results ? results.links.recommendations.length : null},
+        {key: 'jahia', label: t('tabs.jahia'), badge: results ? results.jahia.recommendations.length : null},
         {key: 'vitals', label: t('tabs.vitals'), badge: results ? results.vitals.recommendations.length : null},
         {key: 'readability', label: t('tabs.readability'), badge: results ? results.readability.recommendations.length : null}
     ];
@@ -215,6 +252,8 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                                 <SeoTab result={results.seo}/>}
                             {activeTab === 'links' &&
                                 <LinksTab result={results.links} onHighlight={highlight}/>}
+                            {activeTab === 'jahia' &&
+                                <JahiaTab result={results.jahia} onHighlightText={highlightText}/>}
                             {activeTab === 'vitals' &&
                                 <VitalsTab result={results.vitals}/>}
                             {activeTab === 'readability' &&

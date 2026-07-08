@@ -17,9 +17,55 @@
             "accessibility": "Accessibilité",
             "seo": "SEO",
             "links": "Liens",
+            "jahia": "Jahia",
             "vitals": "Web Vitals",
             "readability": "Lisibilité",
             "badgeTooltip": "{{count}} points à corriger"
+        },
+        "jahia": {
+            "summary": "Synthèse de la page",
+            "pageStatus": "Statut de publication de la page",
+            "scanned": "{{count}} nœuds de contenu analysés",
+            "languages": "Langues du site vérifiées",
+            "unpublished": "Contenus non visibles des visiteurs",
+            "untranslated": "Traductions manquantes",
+            "rawKeys": "Clés de traduction brutes visibles sur la page",
+            "placeholders": "Textes de remplissage",
+            "statuses": {
+                "PUBLISHED": "Publié",
+                "MODIFIED": "Modifié (changements non publiés)",
+                "NOT_PUBLISHED": "Jamais publié",
+                "UNPUBLISHED": "Dépublié",
+                "MARKED_FOR_DELETION": "Marqué pour suppression",
+                "CONFLICT": "Conflit",
+                "LIVE_MODIFIED": "Modifié en live",
+                "LIVE_ONLY": "Live uniquement",
+                "MANDATORY_LANGUAGE_UNPUBLISHABLE": "Langue obligatoire manquante",
+                "MANDATORY_LANGUAGE_VALID": "Langue obligatoire valide",
+                "DELETED": "Supprimé"
+            },
+            "recs": {
+                "rawI18nKeys": {
+                    "title": "{{count}} clés de traduction brutes visibles des visiteurs",
+                    "detail": "Un texte comme namespace:key.path signifie qu'une entrée de resource bundle ou de JSON de locale manque : les visiteurs voient la clé technique au lieu du libellé. Généralement un oubli i18n du module."
+                },
+                "unpublishedChanges": {
+                    "title": "{{count}} blocs de contenu non publiés",
+                    "detail": "Ces nœuds ont été modifiés ou jamais publiés : les visiteurs voient actuellement une version plus ancienne de la page, ou rien du tout. Publiez la page pour aligner le live sur ce que vous éditez."
+                },
+                "missingTranslations": {
+                    "title": "{{count}} blocs de contenu sans traduction ({{languages}})",
+                    "detail": "Ce contenu s'affiche vide ou retombe sur une autre langue pour les visiteurs naviguant dans ces langues. Ouvrez chaque nœud dans l'éditeur et complétez les langues manquantes."
+                },
+                "placeholderText": {
+                    "title": "{{count}} textes de remplissage sur la page",
+                    "detail": "Du lorem ipsum / TODO est encore visible. Remplacez-le par le contenu final avant publication."
+                },
+                "graphqlUnavailable": {
+                    "title": "Les vérifications du référentiel n'ont pas pu s'exécuter",
+                    "detail": "La requête GraphQL a échoué : les contrôles de publication et de traduction ont été ignorés. Les contrôles sur la page restent valides."
+                }
+            }
         },
         "seo": {
             "preview": "Aperçu de partage social",
@@ -115,16 +161,11 @@
             "truncated": "{{count}} non vérifiés (limite atteinte)",
             "externalNote": "les liens externes ne sont pas vérifiés (restriction cross-origin du navigateur)",
             "broken": "Liens cassés",
-            "editWorkspace": "Liens vers l'espace d'édition",
             "statusError": "erreur",
             "recs": {
                 "brokenLinks": {
                     "title": "{{count}} liens internes cassés",
                     "detail": "Ces liens renvoient une erreur aux visiteurs. Corrigez-les ou supprimez-les : la liste ci-dessous les localise avec un bouton de surlignage."
-                },
-                "editWorkspaceUrls": {
-                    "title": "{{count}} liens pointent vers l'espace d'édition",
-                    "detail": "Des URL contenant /cms/render/default/ ou /cms/edit/ ont été collées depuis l'interface d'édition. Les visiteurs obtiendront une page de connexion ou une 404. Remplacez-les par des liens de page internes."
                 },
                 "hardcodedUrls": {
                     "title": "{{count}} URL absolues codées en dur vers ce serveur",

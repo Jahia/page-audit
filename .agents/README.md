@@ -13,6 +13,11 @@ This module is a **Track 2 OSGi UI extension** (see AIStartupKit CLAUDE.md): Mav
 - `axe.source` was **removed in axe-core 4.x**. axe is shipped as a module static resource (`axe.min.js`, copied by webpack) and injected into the iframe via `<script src>`, then run as `contentWindow.axe.run(...)` - never `axe.run` from the parent realm.
 - Run `runWebVitals` **before** `runAccessibility` and keep the `SELF_INJECTED` filter: the injected axe script otherwise shows up in the page's own resource statistics.
 - Resource sizes use `transferSize || encodedBodySize`; memory-cache hits can still report 0, so page weight is indicative only.
+- The link checker must **never fetch login/logout/`.do` URLs** (`SIDE_EFFECT` regex): requesting the logout link kills the editor's jContent session. Skipped links are reported in the summary, never silently dropped.
+- The preview renders the **default workspace**, so internal links legitimately look like `/cms/render/default/...` - that URL shape is NOT a defect and must not be flagged.
+- GraphQL goes through **jcontent's shared Apollo client**: `@apollo/client` is declared in webpack `shared` with `import: false` (consumed from the host, never bundled), and `useApolloClient()` works in the drawer because `createPortal` preserves React context from the action component.
+- Page-scoped JCR traversal: `descendants(typesFilter: {types: ["jnt:content"]}, recursionTypesFilter: {multi: NONE, types: ["jnt:page"]})` - `multi: NONE` means "recurse into everything EXCEPT these types", which stops at sub-page boundaries. Without it you get the whole subtree of every child page.
+- Untranslated detection flags only nodes whose `translationLanguages` is non-empty but missing an `activeInEdit` site language - nodes with no translation nodes at all simply have no i18n properties (not a defect).
 - All analyzers receive the iframe element and must throw (not silently return) when `contentDocument` is unavailable.
 
 ## Layout

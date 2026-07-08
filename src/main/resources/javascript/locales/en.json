@@ -17,9 +17,55 @@
             "accessibility": "Accessibility",
             "seo": "SEO",
             "links": "Links",
+            "jahia": "Jahia",
             "vitals": "Web Vitals",
             "readability": "Readability",
             "badgeTooltip": "{{count}} issues to review"
+        },
+        "jahia": {
+            "summary": "Page summary",
+            "pageStatus": "Page publication status",
+            "scanned": "{{count}} content nodes analyzed",
+            "languages": "Site languages checked",
+            "unpublished": "Content not visible to visitors",
+            "untranslated": "Missing translations",
+            "rawKeys": "Raw translation keys visible on the page",
+            "placeholders": "Placeholder text",
+            "statuses": {
+                "PUBLISHED": "Published",
+                "MODIFIED": "Modified (unpublished changes)",
+                "NOT_PUBLISHED": "Never published",
+                "UNPUBLISHED": "Unpublished",
+                "MARKED_FOR_DELETION": "Marked for deletion",
+                "CONFLICT": "Conflict",
+                "LIVE_MODIFIED": "Modified in live",
+                "LIVE_ONLY": "Live only",
+                "MANDATORY_LANGUAGE_UNPUBLISHABLE": "Mandatory language missing",
+                "MANDATORY_LANGUAGE_VALID": "Mandatory language valid",
+                "DELETED": "Deleted"
+            },
+            "recs": {
+                "rawI18nKeys": {
+                    "title": "{{count}} raw translation keys visible to visitors",
+                    "detail": "Text like namespace:key.path means a resource bundle or locale JSON entry is missing: visitors see the technical key instead of the label. Usually a module i18n gap."
+                },
+                "unpublishedChanges": {
+                    "title": "{{count}} content blocks not published",
+                    "detail": "These nodes were modified or never published: visitors currently see an older version of this page, or nothing at all. Publish the page to align live with what you are editing."
+                },
+                "missingTranslations": {
+                    "title": "{{count}} content blocks missing translations ({{languages}})",
+                    "detail": "This content renders empty or falls back to another language for visitors browsing in those languages. Open each node in the editor and fill in the missing languages."
+                },
+                "placeholderText": {
+                    "title": "{{count}} placeholder texts on the page",
+                    "detail": "Lorem ipsum / TODO text is still visible. Replace it with final content before publishing."
+                },
+                "graphqlUnavailable": {
+                    "title": "Repository checks could not run",
+                    "detail": "The GraphQL query failed, so publication and translation checks were skipped. The on-page checks above remain valid."
+                }
+            }
         },
         "seo": {
             "preview": "Social sharing preview",
@@ -115,16 +161,11 @@
             "truncated": "{{count}} not verified (limit reached)",
             "externalNote": "external links are not verified (browser cross-origin restriction)",
             "broken": "Broken links",
-            "editWorkspace": "Links to the edit workspace",
             "statusError": "error",
             "recs": {
                 "brokenLinks": {
                     "title": "{{count}} broken internal links",
                     "detail": "These links return an error for visitors. Fix or remove them - the list below shows each one with a highlight button."
-                },
-                "editWorkspaceUrls": {
-                    "title": "{{count}} links point to the edit workspace",
-                    "detail": "URLs containing /cms/render/default/ or /cms/edit/ were pasted from the editing UI. Visitors will get a login page or 404. Replace them with internal page links."
                 },
                 "hardcodedUrls": {
                     "title": "{{count}} absolute URLs hardcoded to this host",
