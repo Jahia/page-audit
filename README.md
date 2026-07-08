@@ -8,6 +8,7 @@ Jahia jContent UI extension (OSGi/Maven, React 18, Webpack + Module Federation) 
 | **SEO** | Title and meta-description length bands, `noindex`/`nofollow` detection, canonical URL, Open Graph / Twitter card completeness with a rendered **social sharing preview card**, JSON-LD presence and validity, `<html lang>` vs audited language, image alt coverage, generic anchor texts. |
 | **Links** | Verifies every internal link with the editor's session (HEAD, batched) and lists broken ones with highlight-in-preview. Flags hardcoded absolute URLs to the current host, mixed content, and `target="_blank"` without `rel="noopener"`. Never fetches login/logout/`.do` URLs (side effects); external links are counted but honestly marked unverifiable from the browser. |
 | **Jahia** | The checks no generic web tool can do, via jcontent's shared Apollo GraphQL client: unpublished content blocks on the page (visitors see an older version), content missing translations in active site languages, raw i18n keys visible in the DOM (`namespace:key.path`), and placeholder text (lorem ipsum / TODO). |
+| **AI review** (optional) | Sends the page text plus a digest of all audit findings to a configured LLM (Anthropic, OpenAI or DeepSeek) and returns an overall assessment plus prioritized, editor-friendly recommendations with exact-wording quotes highlightable in the preview. Disabled until an administrator configures a provider - see below. |
 | **Web Vitals** | Lab measurement via buffered `PerformanceObserver` and navigation timing: TTFB, DOM ready, full load, CLS, LCP (estimated - Chrome emits no LCP/paint entries in iframes; INP requires interaction), plus diagnostics: page weight, request count, DOM size, image issues, largest resources. |
 | **Readability** | Language-aware scoring: Flesch Reading Ease + Flesch-Kincaid grade (EN), Kandel-Moles adaptation (FR). Sentence/paragraph stats, heading structure checks. |
 
@@ -24,6 +25,20 @@ curl -s --user root:root --form bundle=@target/page-audit-1.0.0-SNAPSHOT.jar --f
 ```
 
 The module must be **enabled on the target site** (Administration > Modules) for the action to appear - the action guards with `requireModuleInstalledOnSite`. It shows on `jnt:page` and `jmix:mainResource` content.
+
+## AI review configuration (optional)
+
+The AI tab stays disabled until configured. Edit `digital-factory-data/karaf/etc/org.jahia.se.modules.pageaudit.cfg` at runtime (picked up immediately, no restart):
+
+```properties
+AI_PROVIDER=anthropic        # anthropic | openai | deepseek
+AI_MODEL=claude-sonnet-5
+AI_API_KEY=sk-ant-...        # never commit; never sent to the browser
+AI_MAX_TOKENS=2048
+AI_PROMPT_APPENDIX=          # optional brand/editorial instructions
+```
+
+The prompt is built **server-side** from a constrained payload (page text + audit digest), so the endpoint cannot be reused as a general-purpose LLM proxy; the servlet also rejects unauthenticated calls. The model must answer with a strict JSON schema (severity, category, title, detail, exact wording) that is validated and whitelisted server-side before reaching the browser - inspired by [ai-content-sentinel](https://github.com/Jahia/ai-content-sentinel) and the [jahia-mcp-chat](https://github.com/smonier/jahia-mcp-chat) proxy pattern.
 
 ## CI and dependency updates
 

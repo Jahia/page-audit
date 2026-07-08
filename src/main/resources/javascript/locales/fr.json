@@ -18,9 +18,29 @@
             "seo": "SEO",
             "links": "Liens",
             "jahia": "Jahia",
+            "ai": "Revue IA",
             "vitals": "Web Vitals",
             "readability": "Lisibilité",
             "badgeTooltip": "{{count}} points à corriger"
+        },
+        "ai": {
+            "checking": "Vérification de la disponibilité de la revue IA…",
+            "notConfigured": "La revue IA n'est pas configurée sur ce serveur. Un administrateur doit renseigner AI_PROVIDER, AI_MODEL et AI_API_KEY dans :",
+            "intro": "Envoie le texte de la page et les résultats de l'audit à {{provider}} ({{model}}) et renvoie des recommandations priorisées pour les contributeurs. La clé API reste sur le serveur.",
+            "generate": "Générer la revue IA",
+            "regenerate": "Régénérer",
+            "generating": "Analyse de la page par l'IA… quelques secondes.",
+            "summary": "Évaluation globale",
+            "error": "La revue IA a échoué",
+            "poweredBy": "Généré par {{provider}} · {{model}}",
+            "disclaimer": "Suggestions générées par IA : à relire avant application.",
+            "categories": {
+                "content": "Contenu",
+                "seo": "SEO",
+                "accessibility": "Accessibilité",
+                "performance": "Performance",
+                "ux": "UX"
+            }
         },
         "jahia": {
             "summary": "Synthèse de la page",

@@ -9,12 +9,14 @@ import {runSeo} from './analyzers/seo';
 import {runLinks} from './analyzers/links';
 import {runJahiaHealth} from './analyzers/jahiaHealth';
 import {removeToolingElements} from './analyzers/tooling';
+import {requestAiReview} from './analyzers/aiReview';
 import {AccessibilityTab} from './tabs/AccessibilityTab';
 import {VitalsTab} from './tabs/VitalsTab';
 import {ReadabilityTab} from './tabs/ReadabilityTab';
 import {SeoTab} from './tabs/SeoTab';
 import {LinksTab} from './tabs/LinksTab';
 import {JahiaTab} from './tabs/JahiaTab';
+import {AiTab} from './tabs/AiTab';
 import styles from './PageAuditDrawer.module.css';
 
 // Let client islands hydrate and layout settle before measuring
@@ -27,6 +29,10 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
     const [status, setStatus] = useState('idle');
     const [results, setResults] = useState(null);
     const [error, setError] = useState(null);
+    // AI review state lives here so it survives tab switches
+    const [aiReview, setAiReview] = useState(null);
+    const [aiPhase, setAiPhase] = useState('idle');
+    const [aiError, setAiError] = useState(null);
     const [runId, setRunId] = useState(0);
     // The iframe is mounted only once the drawer slide-in transition is done:
     // loading it while the drawer is still translated off-screen makes Chrome
@@ -42,6 +48,9 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
             setStatus('loading');
             setResults(null);
             setError(null);
+            setAiReview(null);
+            setAiPhase('idle');
+            setAiError(null);
             highlightedRef.current = null;
             const timer = setTimeout(() => setFrameVisible(true), 400);
             return () => clearTimeout(timer);
@@ -149,6 +158,29 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
         }
     }, []);
 
+    const generateAiReview = useCallback(async () => {
+        if (!results) {
+            return;
+        }
+
+        setAiPhase('running');
+        setAiError(null);
+        try {
+            const review = await requestAiReview({
+                language,
+                path,
+                results,
+                frame: frameRef.current
+            });
+            setAiReview(review);
+            setAiPhase('done');
+        } catch (e) {
+            console.error('[page-audit] AI review failed', e);
+            setAiError(e.message);
+            setAiPhase('error');
+        }
+    }, [results, language, path]);
+
     const exportJson = useCallback(() => {
         if (!results) {
             return;
@@ -169,6 +201,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
         {key: 'seo', label: t('tabs.seo'), badge: results ? results.seo.recommendations.length : null},
         {key: 'links', label: t('tabs.links'), badge: results ? results.links.recommendations.length : null},
         {key: 'jahia', label: t('tabs.jahia'), badge: results ? results.jahia.recommendations.length : null},
+        {key: 'ai', label: t('tabs.ai'), badge: aiReview ? aiReview.recommendations.length : null},
         {key: 'vitals', label: t('tabs.vitals'), badge: results ? results.vitals.recommendations.length : null},
         {key: 'readability', label: t('tabs.readability'), badge: results ? results.readability.recommendations.length : null}
     ];
@@ -266,6 +299,14 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                                 <LinksTab result={results.links} onHighlight={highlight}/>}
                             {activeTab === 'jahia' &&
                                 <JahiaTab result={results.jahia} onHighlightText={highlightText}/>}
+                            {activeTab === 'ai' &&
+                                <AiTab
+                                    review={aiReview}
+                                    phase={aiPhase}
+                                    error={aiError}
+                                    onGenerate={generateAiReview}
+                                    onHighlightText={highlightText}
+                                />}
                             {activeTab === 'vitals' &&
                                 <VitalsTab result={results.vitals}/>}
                             {activeTab === 'readability' &&

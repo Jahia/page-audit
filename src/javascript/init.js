@@ -24,7 +24,7 @@ function register() {
     );
 
     registry.add('action', 'pageAudit', {
-        targets: ['contentActions:899', 'headerPrimaryActions:900'],
+        targets: ['headerPrimaryActions:900'],
         buttonIcon,
         buttonLabel: `${NS}:action.open`,
         component: PageAuditAction
