@@ -233,10 +233,10 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
     const tabs = [
         {key: 'accessibility', label: t('tabs.accessibility'), badge: results ? results.a11y.violations.length : null},
         {key: 'seo', label: t('tabs.seo'), badge: results ? results.seo.recommendations.length : null},
-        {key: 'links', label: t('tabs.links'), badge: results ? results.links.recommendations.length : null},
-        {key: 'jahia', label: t('tabs.jahia'), badge: results ? results.jahia.recommendations.length : null},
         {key: 'vitals', label: t('tabs.vitals'), badge: results ? results.vitals.recommendations.length : null},
         {key: 'readability', label: t('tabs.readability'), badge: results ? results.readability.recommendations.length : null},
+        {key: 'links', label: t('tabs.links'), badge: results ? results.links.recommendations.length : null},
+        {key: 'jahia', label: t('tabs.jahia'), badge: results ? results.jahia.recommendations.length : null},
         {key: 'ai', label: t('tabs.ai'), badge: aiReview ? aiReview.recommendations.length : null}
     ];
 
