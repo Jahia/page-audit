@@ -32,6 +32,7 @@
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: -apple-system, BlinkMacSystemFont, 'Nunito Sans', 'Segoe UI', sans-serif;
     font-size: 13px;
+    line-height: 1.55;
     color: #131c21;
     overflow: hidden;
 }
