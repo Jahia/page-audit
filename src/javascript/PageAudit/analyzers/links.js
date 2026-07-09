@@ -16,6 +16,12 @@ const SKIP_SCHEMES = /^(#|mailto:|tel:|javascript:)/i;
 // and .do URLs are Jahia actions with side effects.
 const SIDE_EFFECT = /logout|login|\.do($|\?)/i;
 
+// Only these read-only, content-serving path prefixes are verified with the
+// editor's session; every other same-origin link is counted but never fetched,
+// so a planted link cannot trigger a credentialed side-effect request from
+// whoever audits the page.
+const VERIFIABLE_PATH = /^\/(cms\/render|cms\/file|files)\//i;
+
 async function checkUrl(url) {
     const attempt = async method => {
         const response = await fetch(url, {
@@ -74,7 +80,16 @@ export async function runLinks(frame) {
     const byUrl = new Map();
     let skippedSideEffect = 0;
     internal.forEach(l => {
-        if (SIDE_EFFECT.test(l.abs)) {
+        let pathname = '';
+        try {
+            pathname = new URL(l.abs).pathname;
+        } catch (e) {
+            pathname = '';
+        }
+
+        // Skip (count, do not fetch) side-effect URLs and anything outside the
+        // read-only content-serving allowlist.
+        if (SIDE_EFFECT.test(l.abs) || !VERIFIABLE_PATH.test(pathname)) {
             skippedSideEffect++;
             return;
         }
