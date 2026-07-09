@@ -40,7 +40,9 @@ AI_COST_INPUT_PER_MTOKENS=3.00    # USD per 1M tokens - update when changing mod
 AI_COST_OUTPUT_PER_MTOKENS=15.00  # used for the estimated cost shown to editors
 ```
 
-The prompt is built **server-side** from a constrained payload (page text + audit digest), so the endpoint cannot be reused as a general-purpose LLM proxy; the servlet also rejects unauthenticated calls. The model must answer with a strict JSON schema (severity, category, title, detail, exact wording) that is validated and whitelisted server-side before reaching the browser - inspired by [ai-content-sentinel](https://github.com/Jahia/ai-content-sentinel) and the [jahia-mcp-chat](https://github.com/smonier/jahia-mcp-chat) proxy pattern.
+The prompt is built **server-side** from a constrained payload (page text + audit digest), so the endpoint cannot be reused as a general-purpose LLM proxy. The model must answer with a strict JSON schema (severity, category, title, detail, exact wording) that is validated and whitelisted server-side before reaching the browser - inspired by [ai-content-sentinel](https://github.com/Jahia/ai-content-sentinel) and the [jahia-mcp-chat](https://github.com/smonier/jahia-mcp-chat) proxy pattern.
+
+The endpoint is hardened against abuse of the operator's LLM key: it requires an authenticated (non-guest) user, is bound to a page the caller can actually read (`jcr:read`), rejects cross-origin and non-JSON requests (CSRF), enforces a per-user rate limit (30 reviews / 10 minutes), and returns generic error messages without leaking upstream detail. The status `GET` also requires authentication so the provider/model are not disclosed anonymously.
 
 ## CI and dependency updates
 
@@ -58,4 +60,4 @@ The prompt is built **server-side** from a constrained payload (page text + audi
 - No Java code in this phase. A future PageSpeed Insights proxy (field data for published pages) would follow the OSGi whiteboard servlet + `.cfg` config-service pattern.
 - Automated WCAG checks cover a subset of criteria; the UI states this explicitly and never claims full compliance - the manual checklist covers the rest.
 
-See [.agents/README.md](.agents/README.md) for the agent harness and the full list of implementation traps.
+See [CHANGELOG.md](CHANGELOG.md) for the release history, and [.agents/README.md](.agents/README.md) for the agent harness and the full list of implementation traps.
