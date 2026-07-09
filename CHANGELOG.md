@@ -8,8 +8,8 @@ semantic-ish versioning aligned with the Jahia module version.
 
 ### Security
 - Hardened the AI review endpoint against abuse of the operator's LLM key
-  (fixes [#16](https://github.com/smonier/page-audit/issues/16), PR
-  [#17](https://github.com/smonier/page-audit/pull/17)):
+  (fixes [#16](https://github.com/Jahia/page-audit/issues/16), PR
+  [#17](https://github.com/Jahia/page-audit/pull/17)):
   - **Authorization** - the review is bound to a page the caller can read
     (`jcr:read`); unreadable or missing paths are rejected with `403`.
   - **Rate limiting** - per-user sliding window of 30 reviews / 10 minutes
@@ -77,7 +77,7 @@ semantic-ish versioning aligned with the Jahia module version.
   re-runnable and exportable as JSON. Full English + French UI.
 - MIT licensed; GitHub Actions CI and Dependabot with platform guardrails.
 
-[1.3.0]: https://github.com/smonier/page-audit/releases/tag/v1.3.0
-[1.2.0]: https://github.com/smonier/page-audit/releases/tag/v1.2.0
-[1.1.0]: https://github.com/smonier/page-audit/releases/tag/v1.1.0
-[1.0.0]: https://github.com/smonier/page-audit/releases/tag/v1.0.0
+[1.3.0]: https://github.com/Jahia/page-audit/releases/tag/v1.3.0
+[1.2.0]: https://github.com/Jahia/page-audit/releases/tag/v1.2.0
+[1.1.0]: https://github.com/Jahia/page-audit/releases/tag/v1.1.0
+[1.0.0]: https://github.com/Jahia/page-audit/releases/tag/v1.0.0
