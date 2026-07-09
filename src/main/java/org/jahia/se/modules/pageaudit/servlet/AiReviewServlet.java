@@ -2,6 +2,7 @@ package org.jahia.se.modules.pageaudit.servlet;
 
 import org.jahia.se.modules.pageaudit.config.PageAuditConfigService;
 import org.jahia.services.content.JCRSessionFactory;
+import org.jahia.services.content.JCRSessionWrapper;
 import org.jahia.services.usermanager.JahiaUser;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,6 +21,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +55,12 @@ public class AiReviewServlet extends HttpServlet {
     private static final int MAX_TEXT_CHARS = 15000;
     private static final int MAX_DIGEST_LINES = 60;
     private static final int MAX_RECOMMENDATIONS = 20;
+
+    // Per-user sliding-window rate limit: protects the shared provider quota / cost
+    // from a single caller (e.g. 30 reviews per 10 minutes per user).
+    private static final int RATE_MAX_CALLS = 30;
+    private static final long RATE_WINDOW_MS = 600_000L;
+    private final Map<String, Deque<Long>> callWindows = new ConcurrentHashMap<>();
 
     private static final String SYSTEM_PROMPT =
             "You are a senior web quality consultant reviewing a CMS page before publication. "
@@ -93,6 +104,11 @@ public class AiReviewServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        if (isGuest()) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Authentication required");
+            return;
+        }
+
         JSONObject status = new JSONObject();
         status.put("enabled", configService.isAiEnabled());
         status.put("provider", configService.getProvider());
@@ -102,13 +118,22 @@ public class AiReviewServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        if (isGuest()) {
+        JahiaUser user = JCRSessionFactory.getInstance().getCurrentUser();
+        if (user == null || "guest".equals(user.getUsername())) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Authentication required");
             return;
         }
 
-        if (!configService.isAiEnabled()) {
-            writeError(res, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "AI review is not configured");
+        // CSRF hardening: require JSON (which forces a CORS preflight this endpoint
+        // never answers) and reject cross-origin browser requests.
+        String contentType = req.getContentType();
+        if (contentType == null || !contentType.toLowerCase().startsWith("application/json")) {
+            writeError(res, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, "Content-Type must be application/json");
+            return;
+        }
+
+        if (!isSameOrigin(req)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Cross-origin request rejected");
             return;
         }
 
@@ -117,6 +142,23 @@ public class AiReviewServlet extends HttpServlet {
             payload = new JSONObject(req.getReader().lines().collect(Collectors.joining("\n")));
         } catch (Exception e) {
             writeError(res, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON payload");
+            return;
+        }
+
+        // Authorization: only run a review for a page the caller may actually read,
+        // so the endpoint cannot be abused as an open LLM proxy by any authenticated principal.
+        if (!canRead(payload.optString("path", ""))) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "You must have read access to the audited page");
+            return;
+        }
+
+        if (isRateLimited(user.getUsername())) {
+            writeError(res, 429, "Too many AI review requests; please retry later");
+            return;
+        }
+
+        if (!configService.isAiEnabled()) {
+            writeError(res, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "AI review is not configured");
             return;
         }
 
@@ -152,7 +194,7 @@ public class AiReviewServlet extends HttpServlet {
             writeJson(res, HttpServletResponse.SC_OK, review);
         } catch (Exception e) {
             logger.error("AI review failed", e);
-            writeError(res, HttpServletResponse.SC_BAD_GATEWAY, "AI review failed: " + e.getMessage());
+            writeError(res, HttpServletResponse.SC_BAD_GATEWAY, "AI review temporarily unavailable");
         }
     }
 
@@ -376,6 +418,59 @@ public class AiReviewServlet extends HttpServlet {
         }
 
         return fallback;
+    }
+
+    /** True when the current user may read the audited node (binds the endpoint to real editorial access). */
+    private boolean canRead(String path) {
+        if (path == null || path.isBlank() || !path.startsWith("/")) {
+            return false;
+        }
+
+        try {
+            JCRSessionWrapper session = JCRSessionFactory.getInstance().getCurrentUserSession();
+            return session.nodeExists(path) && session.getNode(path).hasPermission("jcr:read");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** Rejects cross-origin browser requests; an absent Origin/Referer means a non-browser caller (no CSRF risk). */
+    private boolean isSameOrigin(HttpServletRequest req) {
+        String candidate = req.getHeader("Origin");
+        if (candidate == null) {
+            candidate = req.getHeader("Referer");
+        }
+
+        if (candidate == null) {
+            return true;
+        }
+
+        try {
+            String candidateHost = new URL(candidate).getHost();
+            String host = req.getHeader("Host");
+            String requestHost = host != null ? host.split(":")[0] : req.getServerName();
+            return candidateHost.equalsIgnoreCase(requestHost);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** Per-user sliding-window limiter over RATE_WINDOW_MS. */
+    private boolean isRateLimited(String user) {
+        long now = System.currentTimeMillis();
+        Deque<Long> window = callWindows.computeIfAbsent(user, k -> new ArrayDeque<>());
+        synchronized (window) {
+            while (!window.isEmpty() && now - window.peekFirst() > RATE_WINDOW_MS) {
+                window.pollFirst();
+            }
+
+            if (window.size() >= RATE_MAX_CALLS) {
+                return true;
+            }
+
+            window.addLast(now);
+            return false;
+        }
     }
 
     private boolean isGuest() {
