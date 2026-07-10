@@ -4,6 +4,26 @@ All notable changes to Page Quality Audit are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/); this project follows
 semantic-ish versioning aligned with the Jahia module version.
 
+## [1.4.0] - 2026-07-09
+
+### Added
+- **Ecodesign (RGESN) tab**: page-level checks against the French RGESN 2024
+  eco-design referential (Frontend / Contents / UX / Architecture families) -
+  page weight, HTTP requests, DOM size, lazy-loading, web fonts, autoplay media,
+  legacy image formats, oversized images, missing dimensions, third-party
+  origins - each with an actionable recommendation, plus a manual checklist for
+  the whole-service criteria (hosting, backend, governance) that a single page
+  cannot assess. It is explicit in-UI that this is **not** an RGESN conformity
+  score. Reuses the Web Vitals resource data.
+- AI review gains an **`ecodesign` category** so the LLM can flag
+  digital-sustainability issues in prose.
+
+### Fixed
+- The localStorage results cache now carries a schema version; entries written
+  by an older module version are discarded instead of restored, preventing a
+  crash when the cached shape lacks a newly added analyzer key. Tab badges and
+  dispatch are null-guarded as defense-in-depth.
+
 ## [1.3.0] - 2026-07-09
 
 ### Security
@@ -77,6 +97,7 @@ semantic-ish versioning aligned with the Jahia module version.
   re-runnable and exportable as JSON. Full English + French UI.
 - MIT licensed; GitHub Actions CI and Dependabot with platform guardrails.
 
+[1.4.0]: https://github.com/Jahia/page-audit/releases/tag/v1.4.0
 [1.3.0]: https://github.com/Jahia/page-audit/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Jahia/page-audit/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Jahia/page-audit/releases/tag/v1.1.0
