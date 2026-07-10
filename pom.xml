@@ -25,8 +25,10 @@
     </licenses>
 
     <scm>
-        <connection>scm:dummy:uri</connection>
-        <developerConnection>scm:dummy:uri</developerConnection>
+        <connection>scm:git:git@github.com:Jahia/page-audit.git</connection>
+        <developerConnection>scm:git:git@github.com:Jahia/page-audit.git</developerConnection>
+        <url>https://github.com/Jahia/page-audit</url>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>

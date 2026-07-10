@@ -25,7 +25,124 @@
             "ai": "Revue IA",
             "vitals": "Web Vitals",
             "readability": "Lisibilité",
+            "ecodesign": "Écoconception",
             "badgeTooltip": "{{count}} points à corriger"
+        },
+        "eco": {
+            "score": "Critères de page respectés",
+            "scoreHint": "contrôles RGESN au niveau page",
+            "weight": "Poids de la page",
+            "requests": "Requêtes",
+            "thirdPartyHint": "{{count}} origines tierces",
+            "disclaimer": "Contrôles au niveau de la page sur les familles Frontend/Contenus du RGESN 2024. Ce n'est pas un score de conformité RGESN : une évaluation complète couvre tout le service (hébergement, backend, gouvernance) ; voir la liste de vérification manuelle ci-dessous. Les mesures de ressources proviennent du rendu en espace d'édition et sont indicatives.",
+            "criteria": "Critères de page automatisés",
+            "families": {
+                "frontend": "Frontend",
+                "contents": "Contenus",
+                "ux": "UX/UI",
+                "architecture": "Architecture",
+                "strategy": "Stratégie",
+                "hosting": "Hébergement",
+                "backend": "Backend"
+            },
+            "checks": {
+                "pageWeight": "Poids de la page",
+                "requests": "Requêtes HTTP",
+                "domSize": "Nœuds DOM",
+                "lazyLoading": "Images hors écran sans chargement différé",
+                "webFonts": "Fichiers de polices web",
+                "autoplay": "Médias en lecture automatique",
+                "imageFormats": "Images lourdes en format ancien",
+                "oversizedImages": "Images surdimensionnées",
+                "imageDimensions": "Images sans dimensions",
+                "thirdParty": "Origines tierces"
+            },
+            "recs": {
+                "pageWeight": {
+                    "title": "Page lourde ({{size}})",
+                    "detail": "Compressez les images, supprimez les scripts/styles inutilisés et différez les ressources non critiques. Une page plus légère consomme moins d'énergie et de bande passante par visite (RGESN Frontend)."
+                },
+                "requests": {
+                    "title": "{{count}} requêtes HTTP",
+                    "detail": "Chaque requête coûte un aller-retour et du travail serveur. Regroupez les ressources, différez le bas de page et retirez les scripts tiers inutiles (RGESN Frontend)."
+                },
+                "domSize": {
+                    "title": "DOM volumineux ({{count}} nœuds)",
+                    "detail": "Un DOM lourd augmente la mémoire et l'énergie de rendu sur l'appareil du visiteur. Simplifiez le balisage ou paginez les pages très longues (RGESN Frontend)."
+                },
+                "lazyLoading": {
+                    "title": "{{count}} images hors écran chargées immédiatement",
+                    "detail": "Ajoutez loading=\"lazy\" pour ne charger les images hors écran que si le visiteur y défile - évite de télécharger des données jamais vues (RGESN Frontend)."
+                },
+                "imageFormats": {
+                    "title": "{{count}} images lourdes en format ancien",
+                    "detail": "Servez du WebP ou de l'AVIF plutôt que du JPEG/PNG pour une forte réduction de taille à qualité égale ; laissez Jahia générer des rendus en format moderne (RGESN Contenus)."
+                },
+                "oversizedImages": {
+                    "title": "{{count}} images plus grandes qu'affichées",
+                    "detail": "Le fichier source est bien plus gros que sa taille affichée. Chargez des variantes redimensionnées ou des rendus responsives pour ne transférer aucun pixel inutile (RGESN Contenus)."
+                },
+                "imageDimensions": {
+                    "title": "{{count}} images sans width/height",
+                    "detail": "Des dimensions explicites évitent les recalculs de mise en page (et l'énergie de rendu associée) au chargement des images (RGESN Contenus)."
+                },
+                "webFonts": {
+                    "title": "{{count}} fichiers de polices web chargés",
+                    "detail": "Chaque fichier de police est un téléchargement supplémentaire. Préférez les polices système, limitez les graisses/styles et n'utilisez que le WOFF2 (RGESN Frontend)."
+                },
+                "autoplay": {
+                    "title": "{{count}} médias en lecture automatique",
+                    "detail": "Les vidéos/audios en lecture automatique consomment bande passante et batterie avant toute interaction. Exigez une action de lecture explicite (RGESN UX/UI)."
+                },
+                "thirdParty": {
+                    "title": "{{count}} origines tierces",
+                    "detail": "Chaque origine externe ajoute des connexions DNS/TLS, de l'énergie et une exposition vie privée. Auto-hébergez ou retirez les tiers non essentiels (RGESN Architecture)."
+                }
+            },
+            "checklist": {
+                "title": "Liste de vérification manuelle (service entier, non automatisable)",
+                "intro": "Ces critères RGESN s'évaluent au niveau du service et ne peuvent pas être jugés depuis une seule page. Passez-les en revue avec l'équipe responsable de la plateforme.",
+                "families": {
+                    "strategy": "Stratégie & gouvernance",
+                    "hosting": "Hébergement",
+                    "backend": "Backend & données",
+                    "ux": "UX / fonctionnalités"
+                },
+                "items": {
+                    "envTarget": {
+                        "title": "Des objectifs environnementaux sont définis et pilotés",
+                        "detail": "Le service a des objectifs d'écoconception documentés et un responsable qui en rend compte (RGESN Stratégie)."
+                    },
+                    "reviewMissing": {
+                        "title": "L'impact environnemental est mesuré et suivi",
+                        "detail": "Des indicateurs d'impact sont suivis au fil des versions, pas fixés une fois puis oubliés (RGESN Stratégie)."
+                    },
+                    "greenHost": {
+                        "title": "Hébergement bas carbone",
+                        "detail": "L'infrastructure tourne chez un hébergeur au PUE faible documenté et engagé sur les énergies renouvelables (RGESN Hébergement)."
+                    },
+                    "caching": {
+                        "title": "Cache efficace des ressources statiques",
+                        "detail": "Des en-têtes de cache longue durée et un CDN évitent de re-télécharger les ressources inchangées à chaque visite (RGESN Hébergement/Architecture)."
+                    },
+                    "apiEfficiency": {
+                        "title": "Les API ne renvoient que le nécessaire",
+                        "detail": "Les endpoints évitent la sur-récupération ; les charges utiles sont paginées et limitées aux champs réellement utilisés (RGESN Backend)."
+                    },
+                    "pagination": {
+                        "title": "Pagination plutôt que défilement infini pour les longues listes",
+                        "detail": "Le défilement infini charge sans cesse des données que le visiteur ne lira peut-être jamais ; paginez ou chargez à la demande (RGESN Backend/UX)."
+                    },
+                    "featureNeed": {
+                        "title": "Chaque fonctionnalité justifie son empreinte",
+                        "detail": "Les fonctionnalités sont justifiées par un besoin utilisateur ; les inutilisées sont retirées plutôt que livrées et maintenues (RGESN UX)."
+                    },
+                    "noDarkPattern": {
+                        "title": "Pas de dark patterns d'engagement",
+                        "detail": "Carrousels en lecture auto, notifications agressives et fils sans fin génèrent trafic et énergie inutiles - évitez-les (RGESN UX)."
+                    }
+                }
+            }
         },
         "ai": {
             "checking": "Vérification de la disponibilité de la revue IA…",
@@ -52,7 +169,8 @@
                 "consistency": "Cohérence",
                 "conversion": "Conversion",
                 "localization": "Localisation",
-                "legal": "Juridique"
+                "legal": "Juridique",
+                "ecodesign": "Écoconception"
             }
         },
         "jahia": {

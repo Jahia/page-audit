@@ -5,6 +5,7 @@ import {useApolloClient} from '@apollo/client';
 import {runAccessibility} from './analyzers/accessibility';
 import {runWebVitals} from './analyzers/webVitals';
 import {runReadability} from './analyzers/readability';
+import {runEcodesign} from './analyzers/ecodesign';
 import {runSeo} from './analyzers/seo';
 import {runLinks} from './analyzers/links';
 import {runJahiaHealth, fetchPageLastModified} from './analyzers/jahiaHealth';
@@ -13,6 +14,7 @@ import {requestAiReview} from './analyzers/aiReview';
 import {AccessibilityTab} from './tabs/AccessibilityTab';
 import {VitalsTab} from './tabs/VitalsTab';
 import {ReadabilityTab} from './tabs/ReadabilityTab';
+import {EcodesignTab} from './tabs/EcodesignTab';
 import {SeoTab} from './tabs/SeoTab';
 import {LinksTab} from './tabs/LinksTab';
 import {JahiaTab} from './tabs/JahiaTab';
@@ -27,13 +29,28 @@ const SETTLE_MS = 2500;
 // header). "Re-run" always performs a fresh audit. LRU-capped.
 const CACHE_PREFIX = 'page-audit:';
 const CACHE_MAX_ENTRIES = 10;
+// Bump whenever the cached `results` shape changes (e.g. a new analyzer key),
+// so entries written by an older module version are ignored instead of
+// restored into UI that expects the new shape.
+const CACHE_SCHEMA = 2;
 
 const cacheKey = (path, language) => `${CACHE_PREFIX}${language}:${path}`;
 
 function loadCachedAudit(path, language) {
     try {
         const raw = window.localStorage.getItem(cacheKey(path, language));
-        return raw ? JSON.parse(raw) : null;
+        if (!raw) {
+            return null;
+        }
+
+        const entry = JSON.parse(raw);
+        // Ignore (and clear) entries from an older results schema
+        if (entry.schema !== CACHE_SCHEMA) {
+            window.localStorage.removeItem(cacheKey(path, language));
+            return null;
+        }
+
+        return entry;
     } catch (e) {
         return null;
     }
@@ -176,16 +193,17 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                 // Vitals first: axe injection and link checks would otherwise
                 // appear in the page's own resource statistics.
                 const vitals = await runWebVitals(frame);
+                const ecodesign = runEcodesign(frame, vitals);
                 const readability = runReadability(frame, language);
                 const seo = runSeo(frame, language);
                 const a11y = await runAccessibility(frame);
                 const links = await runLinks(frame);
                 const jahia = await runJahiaHealth(frame, {client: apolloClient, path, language});
-                const newResults = {a11y, vitals, readability, seo, links, jahia};
+                const newResults = {a11y, vitals, ecodesign, readability, seo, links, jahia};
                 const timestamp = Date.now();
                 setResults(newResults);
                 setAuditedAt(timestamp);
-                saveCachedAudit(path, language, {timestamp, results: newResults});
+                saveCachedAudit(path, language, {schema: CACHE_SCHEMA, timestamp, results: newResults});
                 setStatus('ready');
             } catch (e) {
                 console.error('[page-audit] analysis failed', e);
@@ -302,6 +320,7 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
             setAiReview(review);
             setAiPhase('done');
             saveCachedAudit(path, language, {
+                schema: CACHE_SCHEMA,
                 timestamp: auditedAt || Date.now(),
                 results,
                 aiReview: review
@@ -327,15 +346,18 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
         URL.revokeObjectURL(a.href);
     }, [results, path, language, previewUrl, auditedAt]);
 
-    // Badges all mean the same thing: number of issues to review in that tab.
+    // Badge = number of issues to review in that tab; null-safe so a partial
+    // result never breaks the tab bar.
+    const count = (r, extract) => (r ? extract(r) : null);
     const tabs = [
-        {key: 'accessibility', label: t('tabs.accessibility'), badge: results ? results.a11y.violations.length : null},
-        {key: 'seo', label: t('tabs.seo'), badge: results ? results.seo.recommendations.length : null},
-        {key: 'vitals', label: t('tabs.vitals'), badge: results ? results.vitals.recommendations.length : null},
-        {key: 'readability', label: t('tabs.readability'), badge: results ? results.readability.recommendations.length : null},
-        {key: 'links', label: t('tabs.links'), badge: results ? results.links.recommendations.length : null},
-        {key: 'jahia', label: t('tabs.jahia'), badge: results ? results.jahia.recommendations.length : null},
-        {key: 'ai', label: t('tabs.ai'), badge: aiReview ? aiReview.recommendations.length : null}
+        {key: 'accessibility', label: t('tabs.accessibility'), badge: count(results && results.a11y, a => a.violations.length)},
+        {key: 'seo', label: t('tabs.seo'), badge: count(results && results.seo, r => r.recommendations.length)},
+        {key: 'vitals', label: t('tabs.vitals'), badge: count(results && results.vitals, r => r.recommendations.length)},
+        {key: 'readability', label: t('tabs.readability'), badge: count(results && results.readability, r => r.recommendations.length)},
+        {key: 'ecodesign', label: t('tabs.ecodesign'), badge: count(results && results.ecodesign, r => r.recommendations.length)},
+        {key: 'links', label: t('tabs.links'), badge: count(results && results.links, r => r.recommendations.length)},
+        {key: 'jahia', label: t('tabs.jahia'), badge: count(results && results.jahia, r => r.recommendations.length)},
+        {key: 'ai', label: t('tabs.ai'), badge: count(aiReview, r => r.recommendations.length)}
     ];
 
     return (
@@ -451,13 +473,13 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                     )}
                     {status === 'ready' && results && (
                         <>
-                            {activeTab === 'accessibility' &&
+                            {activeTab === 'accessibility' && results.a11y &&
                                 <AccessibilityTab result={results.a11y} onHighlight={highlight}/>}
-                            {activeTab === 'seo' &&
+                            {activeTab === 'seo' && results.seo &&
                                 <SeoTab result={results.seo}/>}
-                            {activeTab === 'links' &&
+                            {activeTab === 'links' && results.links &&
                                 <LinksTab result={results.links} onHighlight={highlight}/>}
-                            {activeTab === 'jahia' &&
+                            {activeTab === 'jahia' && results.jahia &&
                                 <JahiaTab result={results.jahia} onHighlightText={highlightText}/>}
                             {activeTab === 'ai' &&
                                 <AiTab
@@ -467,10 +489,12 @@ export function PageAuditDrawer({isOpen, onClose, path, language}) {
                                     onGenerate={generateAiReview}
                                     onHighlightText={highlightText}
                                 />}
-                            {activeTab === 'vitals' &&
+                            {activeTab === 'vitals' && results.vitals &&
                                 <VitalsTab result={results.vitals}/>}
-                            {activeTab === 'readability' &&
+                            {activeTab === 'readability' && results.readability &&
                                 <ReadabilityTab result={results.readability}/>}
+                            {activeTab === 'ecodesign' && results.ecodesign &&
+                                <EcodesignTab result={results.ecodesign}/>}
                         </>
                     )}
                 </div>

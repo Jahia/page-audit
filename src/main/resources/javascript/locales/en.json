@@ -25,7 +25,124 @@
             "ai": "AI review",
             "vitals": "Web Vitals",
             "readability": "Readability",
+            "ecodesign": "Ecodesign",
             "badgeTooltip": "{{count}} issues to review"
+        },
+        "eco": {
+            "score": "Page criteria met",
+            "scoreHint": "RGESN page-level checks",
+            "weight": "Page weight",
+            "requests": "Requests",
+            "thirdPartyHint": "{{count}} third-party origins",
+            "disclaimer": "Page-level checks against the RGESN 2024 Frontend/Contents families. This is not an RGESN conformity score - a full assessment covers the whole service (hosting, backend, governance); see the manual checklist below. Resource figures are from the editing-workspace render and are indicative.",
+            "criteria": "Automated page criteria",
+            "families": {
+                "frontend": "Frontend",
+                "contents": "Contents",
+                "ux": "UX/UI",
+                "architecture": "Architecture",
+                "strategy": "Strategy",
+                "hosting": "Hosting",
+                "backend": "Backend"
+            },
+            "checks": {
+                "pageWeight": "Page weight",
+                "requests": "HTTP requests",
+                "domSize": "DOM nodes",
+                "lazyLoading": "Below-the-fold images not lazy-loaded",
+                "webFonts": "Web font files",
+                "autoplay": "Autoplay media",
+                "imageFormats": "Legacy-format heavy images",
+                "oversizedImages": "Oversized images",
+                "imageDimensions": "Images without dimensions",
+                "thirdParty": "Third-party origins"
+            },
+            "recs": {
+                "pageWeight": {
+                    "title": "Heavy page ({{size}})",
+                    "detail": "Compress images, drop unused scripts/styles and defer non-critical resources. A lighter page consumes less energy and bandwidth per visit (RGESN Frontend)."
+                },
+                "requests": {
+                    "title": "{{count}} HTTP requests",
+                    "detail": "Each request costs a round-trip and server work. Combine assets, lazy-load below-the-fold content and remove unused third-party scripts (RGESN Frontend)."
+                },
+                "domSize": {
+                    "title": "Large DOM ({{count}} nodes)",
+                    "detail": "A heavy DOM increases memory use and rendering energy on the visitor's device. Simplify the markup or paginate very long pages (RGESN Frontend)."
+                },
+                "lazyLoading": {
+                    "title": "{{count}} below-the-fold images load eagerly",
+                    "detail": "Add loading=\"lazy\" so off-screen images are only fetched if the visitor scrolls to them - avoids downloading data that is never seen (RGESN Frontend)."
+                },
+                "imageFormats": {
+                    "title": "{{count}} heavy images in legacy formats",
+                    "detail": "Serve WebP or AVIF instead of JPEG/PNG for a large size reduction at equal quality; let Jahia generate modern-format renditions (RGESN Contents)."
+                },
+                "oversizedImages": {
+                    "title": "{{count}} images larger than displayed",
+                    "detail": "The source file is much bigger than its rendered size. Upload resized variants or use responsive renditions so no wasted pixels are transferred (RGESN Contents)."
+                },
+                "imageDimensions": {
+                    "title": "{{count}} images without width/height",
+                    "detail": "Explicit dimensions avoid re-layouts (and the extra rendering work they cost) as images load (RGESN Contents)."
+                },
+                "webFonts": {
+                    "title": "{{count}} web font files loaded",
+                    "detail": "Each font file is an extra download. Prefer system fonts, limit weights/styles, and use WOFF2 only (RGESN Frontend)."
+                },
+                "autoplay": {
+                    "title": "{{count}} media elements autoplay",
+                    "detail": "Autoplaying video/audio consumes bandwidth and battery before any interaction. Require an explicit play action (RGESN UX/UI)."
+                },
+                "thirdParty": {
+                    "title": "{{count}} third-party origins",
+                    "detail": "Each external origin adds DNS/TLS connections, energy and privacy exposure. Self-host or remove non-essential third parties (RGESN Architecture)."
+                }
+            },
+            "checklist": {
+                "title": "Manual checklist (whole-service, not automatable)",
+                "intro": "These RGESN criteria are assessed at the service level and cannot be judged from a single page. Review them with the team responsible for the platform.",
+                "families": {
+                    "strategy": "Strategy & governance",
+                    "hosting": "Hosting",
+                    "backend": "Backend & data",
+                    "ux": "UX / features"
+                },
+                "items": {
+                    "envTarget": {
+                        "title": "Environmental targets are defined and owned",
+                        "detail": "The service has documented eco-design objectives and a person accountable for them (RGESN Strategy)."
+                    },
+                    "reviewMissing": {
+                        "title": "Environmental impact is measured and reviewed",
+                        "detail": "Impact indicators are tracked over releases, not set once and forgotten (RGESN Strategy)."
+                    },
+                    "greenHost": {
+                        "title": "Low-carbon hosting",
+                        "detail": "The infrastructure runs on a provider with a documented low PUE and renewable-energy commitment (RGESN Hosting)."
+                    },
+                    "caching": {
+                        "title": "Effective caching of static resources",
+                        "detail": "Long-lived cache headers and a CDN avoid re-downloading unchanged assets on every visit (RGESN Hosting/Architecture)."
+                    },
+                    "apiEfficiency": {
+                        "title": "APIs return only what is needed",
+                        "detail": "Endpoints avoid over-fetching; payloads are paginated and scoped to the fields actually used (RGESN Backend)."
+                    },
+                    "pagination": {
+                        "title": "Pagination over infinite scroll for large lists",
+                        "detail": "Infinite scroll keeps loading data the visitor may never read; paginate or lazy-load on demand (RGESN Backend/UX)."
+                    },
+                    "featureNeed": {
+                        "title": "Every feature earns its footprint",
+                        "detail": "Features are justified against user need; unused ones are removed rather than shipped and maintained (RGESN UX)."
+                    },
+                    "noDarkPattern": {
+                        "title": "No engagement dark patterns",
+                        "detail": "Autoplay carousels, aggressive notifications and endless feeds drive needless traffic and energy - avoid them (RGESN UX)."
+                    }
+                }
+            }
         },
         "ai": {
             "checking": "Checking AI review availability…",
@@ -52,7 +169,8 @@
                 "consistency": "Consistency",
                 "conversion": "Conversion",
                 "localization": "Localization",
-                "legal": "Legal"
+                "legal": "Legal",
+                "ecodesign": "Ecodesign"
             }
         },
         "jahia": {

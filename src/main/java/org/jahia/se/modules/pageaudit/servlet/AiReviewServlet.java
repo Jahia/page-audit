@@ -78,6 +78,9 @@ public class AiReviewServlet extends HttpServlet {
             + "- localization: fragments in the wrong language for the page, machine-translation artifacts, "
             + "untranslated visible strings\n"
             + "- legal: unsubstantiated superlative claims, missing legal mentions, risky wording\n"
+            + "- ecodesign: digital-sustainability issues per the French RGESN referential - heavy pages, "
+            + "too many requests or third-party origins, unoptimized or legacy-format images, autoplay media, "
+            + "excessive web fonts\n"
             + "Do not invent issues.\n\n"
             + "Reply ONLY with a valid JSON object. No markdown, no code fences, no comments, no trailing commas.\n"
             + "JSON structure:\n"
@@ -87,7 +90,8 @@ public class AiReviewServlet extends HttpServlet {
             + "    {\n"
             + "      \"severity\": \"critical\" | \"serious\" | \"moderate\" | \"minor\",\n"
             + "      \"category\": \"content\" | \"seo\" | \"accessibility\" | \"performance\" | \"ux\" | "
-            + "\"proofreading\" | \"factuality\" | \"consistency\" | \"conversion\" | \"localization\" | \"legal\",\n"
+            + "\"proofreading\" | \"factuality\" | \"consistency\" | \"conversion\" | \"localization\" | \"legal\" | "
+            + "\"ecodesign\",\n"
             + "      \"title\": \"short actionable title\",\n"
             + "      \"detail\": \"1-3 sentences: why it matters and how to fix it\",\n"
             + "      \"wording\": \"exact text quoted from the page when the issue concerns specific wording, else empty string\"\n"
@@ -370,7 +374,7 @@ public class AiReviewServlet extends HttpServlet {
                 safeRec.put("category", normalize(r.optString("category", "content"),
                         new String[]{"content", "seo", "accessibility", "performance", "ux",
                                 "proofreading", "factuality", "consistency", "conversion",
-                                "localization", "legal"}, "content"));
+                                "localization", "legal", "ecodesign"}, "content"));
                 safeRec.put("title", r.optString("title", ""));
                 safeRec.put("detail", r.optString("detail", ""));
                 safeRec.put("wording", r.optString("wording", ""));

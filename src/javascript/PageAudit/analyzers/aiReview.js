@@ -81,6 +81,12 @@ export function buildDigest(results) {
             lines.push(`[perf ${r.severity}] ${r.key} ${JSON.stringify(r.params)}`));
     }
 
+    if (results.ecodesign) {
+        lines.push(`Ecodesign (RGESN): ${results.ecodesign.passed}/${results.ecodesign.total} page criteria pass, weight=${Math.round(results.ecodesign.stats.totalBytes / 1024)}kB, ${results.ecodesign.stats.thirdParty} third-party origins`);
+        results.ecodesign.recommendations.forEach(r =>
+            lines.push(`[ecodesign ${r.severity}] ${r.key} ${JSON.stringify(r.params)}`));
+    }
+
     if (results.readability && !results.readability.empty) {
         lines.push(`Readability: ${results.readability.formula} score ${results.readability.score} (${results.readability.band}), ${results.readability.words} words, avg sentence ${results.readability.avgSentenceLength} words`);
         results.readability.recommendations.forEach(r =>
