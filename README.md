@@ -27,6 +27,8 @@ curl -s --user root:root --form bundle=@target/page-audit-1.0.0-SNAPSHOT.jar --f
 
 The module must be **enabled on the target site** (Administration > Modules) for the action to appear - the action guards with `requireModuleInstalledOnSite`. It shows on `jnt:page` and `jmix:mainResource` content.
 
+Upgrading from a release older than 1.6.0 needs an **uninstall first**: the module moved to the `org.jahia.community.modules` groupId, and Jahia refuses to parse a bundle whose module Id is already registered under another groupId (it stays in `STARTING` and its resources return 404). Remove every installed version, then install the new jar. No content is affected - the module defines no content types. Site activation and the `org.jahia.se.modules.pageaudit.cfg` settings are unchanged.
+
 ## AI review configuration (optional)
 
 The AI tab stays disabled until configured. Edit `digital-factory-data/karaf/etc/org.jahia.se.modules.pageaudit.cfg` at runtime (picked up immediately, no restart):
@@ -49,10 +51,12 @@ The endpoint is hardened against abuse of the operator's LLM key: it requires an
 
 ## CI and dependency updates
 
-- GitHub Actions builds every push and PR (Java 17 + Maven; the bundle jar is uploaded as an artifact).
 - Dependabot keeps dependencies current - notably **axe-core**, so new WCAG rules land automatically (the audit runs by WCAG tag, not a hardcoded rule list).
 - Guardrails in `.github/dependabot.yml`, each with its reason in the file: the Jahia parent POM and provided Jahia artifacts are never bumped; React stays on 18; `css-loader` majors are held (7 switches CSS modules to named exports, which compiles and leaves the drawer invisible); majors needing Node 20+ are held while the build pins Node 18.
 - **Majors of the packages shared with jcontent as Module Federation singletons are held** (`i18next`, `react-i18next`, `@jahia/data-helper`, `@jahia/ui-extender`, `@jahia/moonstone`). Webpack elects the highest version among providers, so a newer major shipped by this bundle replaces the host's copy for the entire back-office UI, not just this drawer. Check what the host actually ships (`javascript/apps/package.json` inside the deployed `jcontent` jar) before relaxing one.
+- Continuous integration runs the shared [jahia-modules-action](https://github.com/Jahia/jahia-modules-action) set: module signature, static analysis and build on every pull request, SonarQube analysis (plus a scheduled full scan with OWASP Dependency-Check), SBOM to Dependency-Track, and a SNAPSHOT publish on merge to `main`.
+- Releases are cut by GitHub, not by hand: create a release, tick **Set as a pre-release**, and tag it in Jahia's underscore form (`1_6_0`, not `v1.6.0`). The `On Release` workflow runs the Maven release, refreshes the signature and promotes the staging repository.
+- The changelog is assembled from fragments in `.chachalog/` - add one per user-facing pull request (see [.github/changelog-fragments.md](.github/changelog-fragments.md)) rather than editing `CHANGELOG.md`.
 - CI proves the bundle compiles; it cannot prove the drawer works in jcontent. Validate runtime-affecting bumps locally (build, deploy, open the drawer) before merging - css-loader 7 was CI-green and runtime-broken.
 
 ## Architecture notes
