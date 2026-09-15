@@ -41,17 +41,20 @@ jobs:
       - name: Mark the workspace as a safe git directory
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      # nexus-staging-maven-plugin 1.5.1, activated by the release-to-staging-repository
-      # profile, reflects into java.util and dies on Java 17 with
-      # "Unable to make field java.util.TreeMap.comparator accessible". Reopening that
-      # package is the least invasive mitigation: it keeps the staging-then-promote flow
-      # intact, unlike skip_staging which would change where artifacts land.
-      # Upstream fix belongs in the parent POM (a staging plugin that supports Java 17).
+      # skip_staging bypasses nexus-staging-maven-plugin 1.5.1, which reflects into the
+      # JDK and cannot run on Java 17: opening java.util only moved the failure to
+      # java.lang.reflect, so the plugin is simply not usable here. Artifacts therefore
+      # deploy straight to the release repository instead of going through a staging
+      # repository that is promoted afterwards, and the release-publication step below
+      # finds no staging repository to promote. The durable fix is a staging plugin that
+      # supports Java 17 in the parent POM, after which this input can be removed.
+      # MAVEN_OPTS stays as insurance for other plugins that reflect into the JDK.
       - uses: jahia/jahia-modules-action/release@v2
         name: Release Module
         env:
-          MAVEN_OPTS: --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED
+          MAVEN_OPTS: --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED
         with:
+          skip_staging: 'true'
           github_slug: Jahia/page-audit
           primary_release_branch: main
           release_id: ${{ github.event.release.id }}
