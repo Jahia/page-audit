@@ -10,13 +10,28 @@ semantic-ish versioning aligned with the Jahia module version.
 > see [.github/changelog-fragments.md](.github/changelog-fragments.md). Sections
 > below 1.5.0 predate that workflow and were written by hand.
 
+## 1.6.0
+
+### New Features
+
+* Upgraded the accessibility engine to axe-core 4.13. The Accessibility tab picks up the new rule set automatically, because the audit runs by WCAG tag rather than a hardcoded rule list. Editors will notice that `sectionheader` and `sectionfooter` roles are recognised, deprecated ARIA attributes are now reported as "needs review" instead of ignored, whitespace `alt` on presentational images is accepted, and several colour-contrast false positives caused by stacking contexts are gone. A page can therefore show a different violation count than it did on 4.12 without its markup having changed.
+
+### Bug Fixes
+
+* Moved the module to the `org.jahia.community.modules` groupId. The bundle name, the Java package and the OSGi configuration file name are unchanged, so AI provider settings and per-site activation survive the move.
+
+  Upgrading an instance that already runs an older release is **not** a drop-in install: Jahia identifies a module by its Id, and refuses to parse a bundle whose Id is already registered under a different groupId, leaving it stuck in `STARTING` with its resources unavailable. Uninstall every installed version of Page Quality Audit first, then install the new jar. The module defines no content types, so a full uninstall does not touch site content.
+
+* Held back dependency updates that would break the jContent host. The packages this bundle shares with jContent as Module Federation singletons (i18next, react-i18next, @jahia/data-helper, @jahia/ui-extender, @jahia/moonstone) now have their majors pinned, because Webpack elects the highest version among providers: a newer major shipped here would replace the host's copy for the whole back-office UI, and the build compiles either way so continuous integration cannot catch it. Also refreshed the build tooling (webpack 5.110.3, frontend-maven-plugin 2.0.2).
+
 ## [1.5.0] - 2026-09-07
 
 AI moves from reviewing to assisting: suggestions appear next to the findings
 they address, in the page language, ready to copy.
 
 ### Added
-- **AI suggestions in the SEO tab** (when a provider is configured): ready-to-paste
+
+* **AI suggestions in the SEO tab** (when a provider is configured): ready-to-paste
   `<title>` alternatives, meta descriptions with live character counts, a focus
   keyword plus supporting terms, and heading rewrites (current → suggested with a
   one-line reason, highlightable in the preview) - each with a Copy button.
@@ -27,7 +42,7 @@ they address, in the page language, ready to copy.
   (`task: seo`) with its own prompt and whitelisting parser; cached with the
   audit like the AI review. Also proposes `og:title` / `og:description` for
   the social sharing card.
-- **AI alt text in the Accessibility tab** (when a provider is configured and
+* **AI alt text in the Accessibility tab** (when a provider is configured and
   the page has images without `alt`): per image, a thumbnail, a suggested alt
   (≤125 chars, page language, Copy, highlight) and a one-line reason; purely
   decorative images are flagged for an empty alt. Vision-capable providers
@@ -35,15 +50,15 @@ they address, in the page language, ready to copy.
   text-only, so suggestions there are inferred from file names and context
   and the UI says so. Third server-defined task (`task: alt`), 8 images per
   call.
-- **Suggested fixes in the AI review**: recommendations about specific wording
+* **Suggested fixes in the AI review**: recommendations about specific wording
   now carry a ready-to-copy correction in the page language (typo fixed,
   stronger CTA label, consistent term…).
-- **Call-to-action labels** in the SEO assist: generic link/button labels
+* **Call-to-action labels** in the SEO assist: generic link/button labels
   ("Read more", "Click here", "Submit"… detected after stripping decorations
   like "Read More +") get 2-3 specific alternatives grounded in the CTA's
   surrounding text, with Copy and highlight. The SEO generic-anchor check now
   uses the same normalized matching and covers buttons.
-- **AI plain-language rewrites in the Readability tab** (when a provider is
+* **AI plain-language rewrites in the Readability tab** (when a provider is
   configured and the page has long sentences): up to 6 of the hardest paragraph
   sentences are rewritten in the page language - same facts, shorter sentences,
   common words - with before/after word counts, highlight of the original,
@@ -51,16 +66,18 @@ they address, in the page language, ready to copy.
   scripts inside content blocks are excluded from the candidates.
 
 ### Changed
-- Results cache schema bumped to 3 (the SEO result gained `weakCtas`); older
+
+* Results cache schema bumped to 3 (the SEO result gained `weakCtas`); older
   cached audits are discarded and re-run on the next opening.
 
 ### Fixed
-- The AI review prompt gave the page language as a bare ISO code while the
+
+* The AI review prompt gave the page language as a bare ISO code while the
   report language was spelled out, so a French-UI editor auditing an English
   page could be told to translate the page into French. Both languages are
   now named explicitly, with the rule that content in the page language is
   correct by definition.
-- DeepSeek V4 models reason by default, which consumed the whole `AI_MAX_TOKENS`
+* DeepSeek V4 models reason by default, which consumed the whole `AI_MAX_TOKENS`
   budget (empty answer, `502`) and made the visible answer ignore the JSON-only
   instruction. Reasoning is now disabled on DeepSeek requests, and an empty
   reasoning-only answer produces an explicit server-side diagnostic instead of
@@ -69,7 +86,8 @@ they address, in the page language, ready to copy.
 ## [1.4.0] - 2026-07-09
 
 ### Added
-- **Ecodesign (RGESN) tab**: page-level checks against the French RGESN 2024
+
+* **Ecodesign (RGESN) tab**: page-level checks against the French RGESN 2024
   eco-design referential (Frontend / Contents / UX / Architecture families) -
   page weight, HTTP requests, DOM size, lazy-loading, web fonts, autoplay media,
   legacy image formats, oversized images, missing dimensions, third-party
@@ -77,11 +95,12 @@ they address, in the page language, ready to copy.
   the whole-service criteria (hosting, backend, governance) that a single page
   cannot assess. It is explicit in-UI that this is **not** an RGESN conformity
   score. Reuses the Web Vitals resource data.
-- AI review gains an **`ecodesign` category** so the LLM can flag
+* AI review gains an **`ecodesign` category** so the LLM can flag
   digital-sustainability issues in prose.
 
 ### Fixed
-- The localStorage results cache now carries a schema version; entries written
+
+* The localStorage results cache now carries a schema version; entries written
   by an older module version are discarded instead of restored, preventing a
   crash when the cached shape lacks a newly added analyzer key. Tab badges and
   dispatch are null-guarded as defense-in-depth.
@@ -89,21 +108,22 @@ they address, in the page language, ready to copy.
 ## [1.3.0] - 2026-07-09
 
 ### Security
-- Hardened the AI review endpoint against abuse of the operator's LLM key
+
+* Hardened the AI review endpoint against abuse of the operator's LLM key
   (fixes [#16](https://github.com/Jahia/page-audit/issues/16), PR
   [#17](https://github.com/Jahia/page-audit/pull/17)):
-  - **Authorization** - the review is bound to a page the caller can read
+  * **Authorization** - the review is bound to a page the caller can read
     (`jcr:read`); unreadable or missing paths are rejected with `403`.
-  - **Rate limiting** - per-user sliding window of 30 reviews / 10 minutes
+  * **Rate limiting** - per-user sliding window of 30 reviews / 10 minutes
     (`429` beyond that), protecting the shared provider quota and cost.
-  - **Unauthenticated disclosure** - the status `GET` now requires a non-guest
+  * **Unauthenticated disclosure** - the status `GET` now requires a non-guest
     user, so provider/model/enabled state is no longer readable anonymously.
-  - **CSRF** - the `POST` requires `Content-Type: application/json` (`415`
+  * **CSRF** - the `POST` requires `Content-Type: application/json` (`415`
     otherwise) and rejects cross-origin browser requests via an Origin/Referer
     host check.
-  - **Error disclosure** - provider/exception detail is logged server-side only;
+  * **Error disclosure** - provider/exception detail is logged server-side only;
     the client receives a generic message.
-  - **Link checker** - only same-origin links on a read-only content-serving
+  * **Link checker** - only same-origin links on a read-only content-serving
     allowlist (`/cms/render`, `/cms/file`, `/files`) are verified with the
     editor's session; every other same-origin link is counted but never
     fetched, so a planted link cannot trigger a credentialed side-effect
@@ -112,56 +132,67 @@ they address, in the page language, ready to copy.
 ## [1.2.0] - 2026-07-09
 
 ### Fixed
-- AI review recommendations are now written in the **editor's jContent UI
+
+* AI review recommendations are now written in the **editor's jContent UI
   language** rather than the audited page's language (quoted page wording stays
   verbatim). The prompt states an explicit language name instead of an ISO code
   for reliable results.
 
 ### Changed
-- More comfortable reading: base line-height raised to 1.55 across the drawer,
+
+* More comfortable reading: base line-height raised to 1.55 across the drawer,
   with extra spacing in stat lists and recommendation details.
 
 ## [1.1.0] - 2026-07-08
 
 ### Added
-- **AI review tab** (optional): sends the page text plus a digest of all audit
+
+* **AI review tab** (optional): sends the page text plus a digest of all audit
   findings to a configured LLM (Anthropic, OpenAI or DeepSeek) and returns an
   overall assessment plus up to 15 prioritized recommendations across 11
   categories - including dimensions no automated check covers (proofreading,
   factuality, consistency, conversion, localization quality, legal risk). Exact
   wording is highlightable in the preview; the footer shows token consumption
   and estimated cost. Configured via `org.jahia.se.modules.pageaudit.cfg`.
-- **Result caching** per page and language in localStorage, with a "last audit"
+* **Result caching** per page and language in localStorage, with a "last audit"
   timestamp in the header; reopening the drawer restores instantly.
-- **Staleness detection**: a cheap repository probe flags when the page changed
+* **Staleness detection**: a cheap repository probe flags when the page changed
   after the audit, keeping the old report visible as a fix-it checklist.
-- **Collapsible page preview** for full-height results.
+* **Collapsible page preview** for full-height results.
 
 ### Changed
-- Tab order: Accessibility, SEO, Web Vitals, Readability, Links, Jahia, AI review.
-- Text extraction joins text nodes with spaces (accurate readability counts, no
+
+* Tab order: Accessibility, SEO, Web Vitals, Readability, Links, Jahia, AI review.
+* Text extraction joins text nodes with spaces (accurate readability counts, no
   spurious "missing spaces" findings); Jahia's preview title prefix is stripped
   from SEO title checks.
 
 ### Fixed
-- Editor/preview tooling (e.g. jExperience persona panel) is excluded from all
+
+* Editor/preview tooling (e.g. jExperience persona panel) is excluded from all
   analyzers; HTTP 4xx/5xx preview renders are refused instead of scored.
 
 ## [1.0.0] - 2026-07-08
 
 ### Added
-- Initial release. jContent UI extension adding a "Page audit" action that opens
+
+* Initial release. jContent UI extension adding a "Page audit" action that opens
   a side-drawer auditing the current page across six tabs: Accessibility
   (axe-core WCAG A/AA/AAA + manual checklist), SEO (with social preview), Web
   Vitals (lab), Readability (EN/FR), Links (internal verification), and Jahia
   content health (publication + translation coverage via GraphQL).
-- Every tab leads with severity-ranked, editor-friendly recommendations; results
+* Every tab leads with severity-ranked, editor-friendly recommendations; results
   re-runnable and exportable as JSON. Full English + French UI.
-- MIT licensed; GitHub Actions CI and Dependabot with platform guardrails.
+* MIT licensed; GitHub Actions CI and Dependabot with platform guardrails.
 
 [1.5.0]: https://github.com/Jahia/page-audit/releases/tag/v1.5.0
+
 [1.4.0]: https://github.com/Jahia/page-audit/releases/tag/v1.4.0
+
 [1.3.0]: https://github.com/Jahia/page-audit/releases/tag/v1.3.0
+
 [1.2.0]: https://github.com/Jahia/page-audit/releases/tag/v1.2.0
+
 [1.1.0]: https://github.com/Jahia/page-audit/releases/tag/v1.1.0
+
 [1.0.0]: https://github.com/Jahia/page-audit/releases/tag/v1.0.0
