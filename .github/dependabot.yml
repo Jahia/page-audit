@@ -28,6 +28,25 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "rimraf"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "webpack-cli"
+        update-types: ["version-update:semver-major"]
+
+      # Module Federation singletons shared with the jcontent host. Webpack
+      # elects the HIGHEST version among providers, so publishing a newer
+      # major from this bundle replaces the host's copy for the whole
+      # back-office UI - a bump here can break jcontent, not just this drawer.
+      # Host today: i18next ^20, react-i18next ^11, @jahia/data-helper ^1.1,
+      # @jahia/ui-extender ^1.3. CI cannot catch this: the bundle compiles.
+      - dependency-name: "i18next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-i18next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@jahia/data-helper"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "@jahia/ui-extender"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@jahia/moonstone"
+        update-types: ["version-update:semver-major"]
 
   # Maven: the Jahia parent POM and provided Jahia artifacts are pinned to the
   # platform version and must never be bumped by a bot.
