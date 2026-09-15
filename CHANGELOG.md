@@ -4,6 +4,28 @@ All notable changes to Page Quality Audit are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/); this project follows
 semantic-ish versioning aligned with the Jahia module version.
 
+## [Unreleased]
+
+### Changed
+- **axe-core 4.12.1 -> 4.13.0**: the Accessibility tab picks up the new rule
+  set automatically (the audit runs by WCAG tag, not a hardcoded rule list).
+  Notable behaviour changes editors will see: `sectionheader` / `sectionfooter`
+  roles and `aria-actions` are now recognised, deprecated ARIA attributes are
+  reported as "needs review" rather than ignored, a visible `aria-labelledby`
+  on a prohibited element moves from violation to needs-review, whitespace
+  `alt` on presentational images is accepted, several `color-contrast`
+  stacking-context false positives are fixed, and ARIA element internals are
+  evaluated by default. Some pages will show a different violation count than
+  on 4.12 without their markup having changed.
+- Build tooling: webpack 5.108.4 -> 5.110.3, frontend-maven-plugin 2.0.1 -> 2.0.2.
+- Dependabot now ignores majors of the packages shared with the jcontent host
+  as Module Federation singletons (`i18next`, `react-i18next`,
+  `@jahia/data-helper`, `@jahia/ui-extender`, `@jahia/moonstone`) and of
+  `webpack-cli`. Webpack elects the highest version among providers, so a newer
+  major published by this bundle would replace the host's copy for the whole
+  back-office UI - a failure CI cannot catch, because the bundle compiles
+  either way.
+
 ## [1.5.0] - 2026-09-07
 
 AI moves from reviewing to assisting: suggestions appear next to the findings

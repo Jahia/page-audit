@@ -50,7 +50,9 @@ The endpoint is hardened against abuse of the operator's LLM key: it requires an
 ## CI and dependency updates
 
 - GitHub Actions builds every push and PR (Java 17 + Maven; the bundle jar is uploaded as an artifact).
-- Dependabot keeps dependencies current - notably **axe-core**, so new WCAG rules land automatically (the audit runs by WCAG tag, not a hardcoded rule list). Guardrails: React stays on 18 (jcontent's Module Federation singleton), the Jahia parent POM is never bumped, and majors known to break the runtime or require Node 20+ are ignored with explanations in `.github/dependabot.yml`.
+- Dependabot keeps dependencies current - notably **axe-core**, so new WCAG rules land automatically (the audit runs by WCAG tag, not a hardcoded rule list).
+- Guardrails in `.github/dependabot.yml`, each with its reason in the file: the Jahia parent POM and provided Jahia artifacts are never bumped; React stays on 18; `css-loader` majors are held (7 switches CSS modules to named exports, which compiles and leaves the drawer invisible); majors needing Node 20+ are held while the build pins Node 18.
+- **Majors of the packages shared with jcontent as Module Federation singletons are held** (`i18next`, `react-i18next`, `@jahia/data-helper`, `@jahia/ui-extender`, `@jahia/moonstone`). Webpack elects the highest version among providers, so a newer major shipped by this bundle replaces the host's copy for the entire back-office UI, not just this drawer. Check what the host actually ships (`javascript/apps/package.json` inside the deployed `jcontent` jar) before relaxing one.
 - CI proves the bundle compiles; it cannot prove the drawer works in jcontent. Validate runtime-affecting bumps locally (build, deploy, open the drawer) before merging - css-loader 7 was CI-green and runtime-broken.
 
 ## Architecture notes
