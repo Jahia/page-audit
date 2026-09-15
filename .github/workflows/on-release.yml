@@ -33,6 +33,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GH_SSH_PRIVATE_KEY_JAHIACI }}
 
+      # jahia-modules-action/release runs `git fetch --all` directly, and this job
+      # runs in a container whose user does not own the checked-out workspace, so
+      # git aborts with "detected dubious ownership" before the release starts.
+      # actions/checkout only registers safe.directory under its own temporary HOME,
+      # which later steps do not inherit. Upstream fix belongs in the action itself.
+      - name: Mark the workspace as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - uses: jahia/jahia-modules-action/release@v2
         name: Release Module
         with:
