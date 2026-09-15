@@ -41,8 +41,16 @@ jobs:
       - name: Mark the workspace as a safe git directory
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+      # nexus-staging-maven-plugin 1.5.1, activated by the release-to-staging-repository
+      # profile, reflects into java.util and dies on Java 17 with
+      # "Unable to make field java.util.TreeMap.comparator accessible". Reopening that
+      # package is the least invasive mitigation: it keeps the staging-then-promote flow
+      # intact, unlike skip_staging which would change where artifacts land.
+      # Upstream fix belongs in the parent POM (a staging plugin that supports Java 17).
       - uses: jahia/jahia-modules-action/release@v2
         name: Release Module
+        env:
+          MAVEN_OPTS: --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED
         with:
           github_slug: Jahia/page-audit
           primary_release_branch: main
