@@ -387,7 +387,13 @@
                 "moderate": "Modéré",
                 "minor": "Mineur"
             },
-            "passes": "{{count}} conformes",
+            "passes": "{{count}} règles respectées",
+            "score": {
+                "label": "règles automatiques respectées",
+                "rules": "{{passed}}/{{total}} règles",
+                "violations": "{{count}} violation(s) · {{nodes}} éléments",
+                "notApplicable": "Aucune règle applicable"
+            },
             "incomplete": "{{count}} à vérifier",
             "noViolations": "Aucune violation détectée par les contrôles automatiques.",
             "highlight": "Surligner dans l'aperçu",

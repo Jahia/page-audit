@@ -7,6 +7,27 @@ import styles from './Tabs.module.css';
 
 const LEVELS = ['A', 'AA', 'AAA', 'BP'];
 
+/**
+ * Per-level scorecard: share of APPLICABLE automated rules that passed.
+ * Rules axe could not decide ("to verify") are left out of the ratio - they are
+ * neither passed nor failed. Floored so a single failing rule never displays
+ * as 100%. Deliberately says "automated rules passed", never "compliant": axe
+ * covers a subset of WCAG and the manual checklist covers the rest.
+ */
+function levelScore(level, summary, violations) {
+    const s = summary[level];
+    const applicable = s.passes + s.violations;
+    const nodes = violations
+        .filter(v => v.level === level)
+        .reduce((sum, v) => sum + (v.totalNodes || 0), 0);
+    return {
+        ...s,
+        applicable,
+        nodes,
+        percent: applicable > 0 ? Math.floor((s.passes / applicable) * 100) : null
+    };
+}
+
 function RuleDetails({rule, chip, onHighlight}) {
     const {t} = useTranslation('page-audit');
 
@@ -59,15 +80,31 @@ export function AccessibilityTab({result, onHighlight, assist}) {
         <div>
             <div className={styles.cards}>
                 {LEVELS.map(level => {
-                    const s = result.summary[level];
+                    const s = levelScore(level, result.summary, result.violations);
+                    const toVerify = s.incomplete > 0 ? ` · ${t('a11y.incomplete', {count: s.incomplete})}` : '';
+
+                    // Nothing to test at this level: a neutral card, never a fake 100%
+                    if (s.percent === null) {
+                        return (
+                            <div key={level} className={styles.card}>
+                                <span className={styles.cardTitle}>{t(`a11y.levels.${level}`)}</span>
+                                <span className={styles.cardValue}>-</span>
+                                <span className={styles.cardHint}>{t('a11y.score.notApplicable')}{toVerify}</span>
+                            </div>
+                        );
+                    }
+
                     const ok = s.violations === 0;
                     return (
                         <div key={level} className={`${styles.card} ${ok ? styles.cardGood : styles.cardBad}`}>
                             <span className={styles.cardTitle}>{t(`a11y.levels.${level}`)}</span>
-                            <span className={styles.cardValue}>{s.violations}</span>
+                            <span className={styles.cardValue}>{s.percent}%</span>
+                            <span className={styles.cardLabel}>{t('a11y.score.label')}</span>
                             <span className={styles.cardHint}>
-                                {t('a11y.passes', {count: s.passes})}
-                                {s.incomplete > 0 ? ` · ${t('a11y.incomplete', {count: s.incomplete})}` : ''}
+                                {ok ?
+                                    t('a11y.score.rules', {passed: s.passes, total: s.applicable}) :
+                                    t('a11y.score.violations', {count: s.violations, nodes: s.nodes})}
+                                {toVerify}
                             </span>
                         </div>
                     );

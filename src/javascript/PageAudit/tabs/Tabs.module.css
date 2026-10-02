@@ -28,6 +28,13 @@
     font-weight: 700;
 }
 
+/* Scope of a score ("automated rules passed"), between the value and the hint */
+.cardLabel {
+    font-size: 11px;
+    font-weight: 600;
+    color: #131c21;
+}
+
 .cardHint {
     font-size: 11px;
     color: #6b7a86;
