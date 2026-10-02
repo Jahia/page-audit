@@ -10,6 +10,18 @@ semantic-ish versioning aligned with the Jahia module version.
 > see [.github/changelog-fragments.md](.github/changelog-fragments.md). Sections
 > below 1.5.0 predate that workflow and were written by hand.
 
+## 1.7.0
+
+### New Features
+
+* The Accessibility scorecards now show the share of automated rules that passed at each WCAG level, instead of a violation count where zero was the good result. A clean level reads "100% automated rules passed" in green rather than a bare "0".
+
+  The wording is deliberately not "compliant": automated checks cover only part of WCAG, so a 100% card is not a conformity claim. Rules the engine could not decide stay out of the ratio and are listed as "to verify", a level with nothing to test shows no score instead of a fake 100%, and when a level has violations the card still says how many and how many elements they affect. The French copy also drops "conformes" for the same reason.
+
+### Bug Fixes
+
+* Refreshed the build tooling: webpack 5.111.1 and @jahia/moonstone 2.21.0. Moonstone is a declared dependency but is never imported by the drawer nor shared with jContent, so the update has no effect on the back-office.
+
 ## 1.6.0
 
 ### New Features
