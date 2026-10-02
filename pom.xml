@@ -9,7 +9,7 @@
     <groupId>org.jahia.community.modules</groupId>
     <artifactId>page-audit</artifactId>
     <name>Page Quality Audit</name>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.7.0</version>
     <packaging>bundle</packaging>
     <description>jContent UI extension - page quality audit drawer: accessibility (WCAG A to AAA), SEO, links, content health, web vitals, readability.</description>
 
@@ -25,7 +25,7 @@
         <connection>scm:git:git@github.com:Jahia/page-audit.git</connection>
         <developerConnection>scm:git:git@github.com:Jahia/page-audit.git</developerConnection>
         <url>https://github.com/Jahia/page-audit</url>
-        <tag>HEAD</tag>
+        <tag>1_7_0</tag>
     </scm>
 
     <properties>
