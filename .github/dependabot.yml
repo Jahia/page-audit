@@ -7,6 +7,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # Dependabot uses this as the PR title, which the shared "Lint PR Title" check
+    # requires to carry a conventional-commit type ("chore(deps): bump ...").
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     open-pull-requests-limit: 5
     ignore:
       # React 18 is a hard constraint: the bundle shares jcontent's React 18
@@ -54,6 +59,9 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     ignore:
       - dependency-name: "org.jahia.modules:jahia-modules"
       - dependency-name: "org.jahia.server:*"
