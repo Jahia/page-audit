@@ -1,5 +1,7 @@
 # Page Quality Audit - Agent Harness
 
+**Deprecated (2026-10-29):** this module is replaced by Content Governance (https://github.com/Jahia/content-governance). Do not develop here; work goes to content-governance.
+
 This module is a **Track 2 OSGi UI extension** (see AIStartupKit CLAUDE.md): Maven bundle, React 18, Webpack + Module Federation, `@jahia/ui-extender`. It was cloned from the `jahia-mcp-chat` skeleton.
 
 ## Invariants

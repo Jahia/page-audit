@@ -1,5 +1,13 @@
 # Page Quality Audit
 
+> [!IMPORTANT]
+> **Deprecated: replaced by [Content Governance](https://github.com/Jahia/content-governance).** Page Quality Audit is now part of Content Governance
+> 1.0.0, which brings its accessibility, SEO, Web Vitals, readability, eco-design, links, Jahia and AI review tabs together with the other content checks in one drawer, switched on per
+> site. This repository receives no further releases and will be archived.
+>
+> To move: uninstall Page Quality Audit, then install Content Governance and enable it on your sites; there is no data to carry over; the AI settings move to the shared model configuration.
+> Details: [moving from the three modules](https://github.com/Jahia/content-governance#moving-from-the-three-modules).
+
 Jahia jContent UI extension (OSGi/Maven, React 18, Webpack + Module Federation) that adds a **Page audit** action on pages in jContent and Page Builder. The action opens a right-side drawer that loads the page in a same-origin preview iframe and audits it across eight tabs. Every tab leads with **actionable recommendations** (severity chip + what is wrong + how to fix it), and every tab badge means the same thing: the number of issues to review. When an LLM provider is configured, the audit also **assists**: ready-to-paste suggestions (meta descriptions, titles, keywords, headings, CTA labels, alt texts, plain-language rewrites, wording fixes) appear next to the findings they address - always opt-in, always display + copy, never written to the repository.
 
 | Tab | What it does |
